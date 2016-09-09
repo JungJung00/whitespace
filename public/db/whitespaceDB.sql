@@ -1,0 +1,20 @@
+USE whitespace;
+
+CREATE TABLE member(
+	mbr_Id			VARCHAR(20) NOT NULL UNIQUE,
+    mbr_Pwd			VARCHAR(20) NOT NULL,
+    mbr_EMail		VARCHAR(100) NOT NULL UNIQUE,
+    mbr_Verified	BOOLEAN NOT NULL DEFAULT FALSE,
+    mbr_Made		BOOLEAN NOT NULL DEFAULT FALSE,
+    mbr_Profile		BLOB NULL,
+    mbr_Date		DATETIME NOT NULL,
+    PRIMARY KEY(mbr_Id)
+);
+
+CREATE TABLE board(
+	brd_Title	VARCHAR(20) NOT NULL UNIQUE,
+    brd_Count	INT UNSIGNED NOT NULL DEFAULT 0,
+    brd_Pwd		VARCHAR(20) NULL,
+    brd_Opened	BOOLEAN NOT NULL DEFAULT TRUE,
+    brd_Date	DATETIME NOT NULL
+);

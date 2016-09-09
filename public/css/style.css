@@ -1,0 +1,53 @@
+html, body{
+  height: 100%;
+  margin: 0;
+}
+body{
+  background-color: #FFDBE4;
+}
+/******************/
+
+/******aside********/
+#main-aside{
+  width: 230px;
+  height: inherit;
+  float:left;
+
+  background-color:#FF707E;
+  box-shadow: 3px 0px 10px gray;
+}
+#profile-wrapper img{
+  max-width: 100%;
+
+  border-top-right-radius: inherit;
+}
+#board{
+  margin-top: 0px;
+  padding-left: 0px;
+
+  list-style: none;
+}
+#board li{
+  height: 30px;
+  margin-bottom: 2px;
+  padding-left: 10px;
+
+  background-color: #FF5C67;
+  /*background-color: #FF4545;*/
+
+  font-weight: bold;
+}
+#devider{
+  height: 80px !important;
+  margin-top: 15px;
+  margin-bottom: 19px !important;
+}
+/*******************/
+
+/******content*****/
+#content-wrapper{
+  width: ;
+  height:inherit;
+  float:left;
+}
+/******************/
