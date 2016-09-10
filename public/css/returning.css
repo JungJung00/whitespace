@@ -1,0 +1,15 @@
+/**********login form**********/
+
+#login-wrapper{
+  max-width: 600px;
+  margin: auto;
+  text-align: center;
+}
+
+.form-returning{
+  width: 400px;
+  height: 60px;
+  margin-top: 10px;
+}
+
+/******************************/
