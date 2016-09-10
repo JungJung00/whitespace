@@ -1,0 +1,24 @@
+#burden-wrapper{
+  max-width: 600px;
+  margin: auto;
+  margin-top: 30px;
+  text-align: center;
+}
+
+/***************form***************/
+input:first-child{
+  margin-top: 0px;
+}
+.form-moving{
+  width: 400px;
+  height: 40px;
+  margin-top: 30px;
+}
+
+/**********************************/
+
+/*************content**************/
+
+
+
+/**********************************/
