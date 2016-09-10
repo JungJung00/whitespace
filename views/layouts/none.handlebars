@@ -1,15 +1,22 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="utf-8">
     <title>Do it!</title>
-    
+
     <!-- css -->
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/none.css">
     <link rel="stylesheet" href="/css/login.css">
-  </head>
-  <body>
+</head>
+
+<body>
     {{! body 태그를 보고 뷰 엔진이 뷰 콘텐츠를 어디에 렌더링할지 결정한다. }}
-    {{{body}}}
-  </body>
+    <div id="content-wrapper">
+        {{{body}}}
+    </div>
+    <script type="text/javascript" src="/js/login.js"></script>
+</body>
+
 </html>
