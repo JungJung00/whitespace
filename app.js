@@ -2,10 +2,21 @@
 
 /*****************변수*******************/
 
-const express = require('express');
+var express = require('express');
 var app = express();
-const handlebars = require('express-handlebars').create({defaultLayout:'main'});
+var handlebars = require('express-handlebars').create({defaultLayout:'main'});
 // const $ = require('jquery')(window);
+var mysql = require('mysql');
+// 커넥션 풀 생성 : 필요할 때마다 연결
+var pool = mysql.createPool({
+  host: 'localhost',
+  user: 'root',
+  port: 3306,
+  password: 'ehehgks!!123',
+  database: 'whitespace',
+  connectionLimit: 10
+});
+// 데이터베이스 연결 설정
 
 var fortunes = [
  "Conquer your fears or they will conquer you",
@@ -30,6 +41,11 @@ app.engine('handlebars', handlebars.engine)
 // 애플리케이션 포트 지정
 // res.writeHead 대용
 app.set('port', process.env.PORT || 3001);
+
+// 데이터베이스 연결 방법
+  // pool.getConnection(function(err, cnct){
+  //   내용
+  // })
 /****************************************/
 
 
@@ -38,6 +54,14 @@ app.set('port', process.env.PORT || 3001);
 app.get('/', function(req, res){
  // 뷰 엔진에서 콘텐츠 타입 text/html과 상태 코드 200을 반환하므로 명시하지 않는다.
  res.render('home');
+});
+
+app.get('/test', function(req, res){
+  res.render('test');
+});
+app.post('/test', function(req, res){
+  console.log(req.body.test);
+  res.redirect('/test');
 });
 
 app.get('/returning', function(req, res){
@@ -52,6 +76,16 @@ app.get('/moving', function(req, res){
   res.render('moving', {layout: 'none'});
 });
 app.post('/moving', function(req, res){
+  pool.getConnection(function(err, connection){
+    if(err) throw err;
+    // else{
+      bd = req.body;
+      dbSet = {mbr_Id: req.body.id, mbr_Pwd: req.body.pwd, mbr_Nick: req.body.nick, mbr_EMail: req.body.email};
+      connection.query("INSERT INTO member SET ?", dbSet,
+      function(err, rows){if(err) console.log('Query Error: ' + err); else console.log('Query Success');}
+    );
+    connection.release();
+  });
   console.log(req.body);
   res.redirect('/returning');
 });
