@@ -68,8 +68,35 @@ app.get('/returning', function(req, res){
  res.render('returning', {layout: 'none'});
 })
 app.post('/returning', function(req, res) {
-  console.log(req.body);
-  res.redirect('/returning');
+  pool.getConnection(function(err, connection){
+    if(err) throw err;
+    else{
+      // 로그인 처리
+      connection.query('select * from member where mbr_Id = ?', req.body.id, function(err, rows){
+        if(err){
+          console.log('Query Error: ' + err);
+          redirect('/returning');
+        }
+        else{
+          if(rows.length == 0){
+            console.log('\n\nThere is no ID that you typed');
+            res.redirect('/returning');
+          }
+          else{
+            if(req.body.pwd == rows[0].mbr_Pwd){
+              console.log('\n\nWelcome ' + rows[0].mbr_Nick + '!');
+              res.redirect('/home');
+            }
+            else{
+              console.log('\n\nWrong password!');
+              res.redirect('/returning');
+            }
+          }
+        }
+        connection.release();
+      });
+    }
+  });
 });
 
 app.get('/moving', function(req, res){
@@ -78,18 +105,21 @@ app.get('/moving', function(req, res){
 app.post('/moving', function(req, res){
   pool.getConnection(function(err, connection){
     if(err) throw err;
-    // else{
+    else{
       bd = req.body;
       dbSet = {mbr_Id: req.body.id, mbr_Pwd: req.body.pwd, mbr_Nick: req.body.nick, mbr_EMail: req.body.email};
       connection.query("INSERT INTO member SET ?", dbSet,
-      function(err, rows){if(err) console.log('Query Error: ' + err); else console.log('Query Success');}
-    );
+      function(err, rows){if(err) console.log('Query Error: ' + err); else console.log('Query Success');});
+  }
     connection.release();
   });
   console.log(req.body);
   res.redirect('/returning');
 });
 
+app.get('/home', function(req, res){
+  res.render('home');
+});
 /***************************************/
 
 
