@@ -5,7 +5,6 @@
 var express = require('express');
 var app = express();
 var handlebars = require('express-handlebars').create({defaultLayout:'main'});
-// const $ = require('jquery')(window);
 var mysql = require('mysql');
 // 커넥션 풀 생성 : 필요할 때마다 연결
 var pool = mysql.createPool({
@@ -16,14 +15,10 @@ var pool = mysql.createPool({
   database: 'whitespace',
   connectionLimit: 10
 });
-// 데이터베이스 연결 설정
-
-var fortunes = [
- "Conquer your fears or they will conquer you",
- "Rivers need springs",
- "Do not fear what you don't know",
- "Whenever possible, keep it simple"
-];
+// 게시판 목록 저장
+var _boards = '';
+// 비동기 순서 체크용
+var test = 0;
 
 /****************************************/
 
@@ -46,14 +41,27 @@ app.set('port', process.env.PORT || 3001);
   // pool.getConnection(function(err, cnct){
   //   내용
   // })
+
 /****************************************/
 
 
 /***************라우팅*******************/
 
 app.get('/', function(req, res){
- // 뷰 엔진에서 콘텐츠 타입 text/html과 상태 코드 200을 반환하므로 명시하지 않는다.
- res.render('home');
+ pool.getConnection(function(err, connection){
+   if(err) throw err;
+   else{
+     connection.query('select brd_Title from board', function(err, rows){
+       _boards = '';
+       for(var i in rows){
+         _boards += '<li>' + rows[i].brd_Title + '</li>';
+       }console.log(_boards);
+       // getConnection 함수 밖에 렌더 함수를 쓰면 비동기 방식이기 때문에 게시판 항목을 모두 읽어오기 전 렌더링을 해버린다.
+       res.render('home', {boards: _boards});
+     });
+   }
+   connection.release();
+ });
 });
 
 app.get('/test', function(req, res){
@@ -117,9 +125,6 @@ app.post('/moving', function(req, res){
   res.redirect('/returning');
 });
 
-app.get('/home', function(req, res){
-  res.render('home');
-});
 /***************************************/
 
 
