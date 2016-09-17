@@ -1,4 +1,4 @@
-#content-wrapper{
+.content-wrapper{
   width: 100%;
 }
 
@@ -40,7 +40,7 @@
 
 /*****************content****************/
 .enter{
-  color: #FA6E75  
+  color: #FA6E75
 }
 h3{
   word-spacing: 3px;

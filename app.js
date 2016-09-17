@@ -55,7 +55,8 @@ app.get('/', function(req, res){
        _boards = '';
        for(var i in rows){
          _boards += '<li>' + rows[i].brd_Title + '</li>';
-       }console.log(_boards);
+       }console.log('Get boards menu');
+      // x  console.log(_boards);
        // getConnection 함수 밖에 렌더 함수를 쓰면 비동기 방식이기 때문에 게시판 항목을 모두 읽어오기 전 렌더링을 해버린다.
        res.render('home', {boards: _boards});
      });
@@ -86,15 +87,18 @@ app.post('/returning', function(req, res) {
           redirect('/returning');
         }
         else{
+          // 아이디 불일치
           if(rows.length == 0){
             console.log('\n\nThere is no ID that you typed');
             res.redirect('/returning');
           }
           else{
+            // 아이디, 비밀번호 일치
             if(req.body.pwd == rows[0].mbr_Pwd){
               console.log('\n\nWelcome ' + rows[0].mbr_Nick + '!');
-              res.redirect('/home');
+              res.redirect('/');
             }
+            // 비밀번호 불일치
             else{
               console.log('\n\nWrong password!');
               res.redirect('/returning');

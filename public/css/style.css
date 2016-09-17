@@ -5,11 +5,18 @@ html, body{
 body{
   background-color: #FFE8EE;
 }
+
+a{
+  text-decoration: none;
+  color: blue;
+}
 /******************/
 
 /******aside********/
 #main-aside{
-  width: 230px;
+  width: 17%;
+  max-width: 210px;
+  min-width: 170px;
   height: inherit;
   float:left;
 
@@ -22,13 +29,11 @@ body{
 #board{
   margin-top: 0px;
   padding-left: 0px;
-
-  list-style: none;
 }
 #board li{
   height: 30px;
   margin-bottom: 2px;
-  padding-left: 10px;
+  padding-left: 7px;
 
   background-color: #FF5C67;
   /*background-color: #FF4545;*/
@@ -43,9 +48,13 @@ body{
 /*******************/
 
 /******content*****/
-#content-wrapper{
-  width: ;
+.content-wrapper{
+  width: 83%;
   height:inherit;
   float:left;
+}
+
+ul{
+  list-style: none;
 }
 /******************/
