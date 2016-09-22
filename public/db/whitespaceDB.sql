@@ -29,10 +29,11 @@ CREATE TABLE board(
 
 CREATE TABLE post(
 	brd_Title	VARCHAR(20) NOT NULL,
-	pst_Id		INT NOT NULL UNIQUE,
+	pst_Id		INT NOT NULL UNIQUE AUTO_INCREMENT,
 	pst_Title	VARCHAR(200) NOT NULL,
     pst_Content VARCHAR(20000) NOT NULL,
-    pst_Writer	VARCHAR(30) NOT NULL UNIQUE,
+    pst_View	INT NOT NULL DEFAULT 0,
+    pst_Writer	VARCHAR(30) NOT NULL,
     pst_Date	DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY(pst_Id)
     # FOREIGN KEY(brd_Title) REFERENCES board(brd_title)
@@ -40,14 +41,14 @@ CREATE TABLE post(
 
 CREATE TABLE img(
 	pst_Id		INT NOT NULL,
-    img_Num	 	INT NOT NULL,
+    img_Num	 	INT NOT NULL UNIQUE AUTO_INCREMENT,
     pst_Img		BLOB NOT NULL,
     PRIMARY KEY(pst_Id, img_Num)
     # FOREIGN KEY(pst_Id) REFERENCES post(pst_Id)
 );
 
 CREATE TABLE coment( # there is a token named 'comment', so just think coment means comment
-	pst_Num			INT NOT NULL,
+	pst_Id			INT NOT NULL,
 	cmnt_Writer		VARCHAR(30) NOT NULL,
     cmnt_Content	VARCHAR(600) NOT NULL,
     cmnt_Date		DATETIME NOT NULL,

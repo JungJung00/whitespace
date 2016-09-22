@@ -6,33 +6,25 @@
 <div class="prepost-list-wrapper">
   <ul>
     <li class="prepost-wrapper">
-      <div class="prepost-title">
-        <pre>게시판 표시
-제ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ목 표시</pre>
+      <script type="text/javascript">
+        $(document).ready(function(){
+          paging('home');
+        });
+      </script>
+      <div class="prepost prepost-title">
+        <span>게시판 표시</span>
+        <br>
+        <a href="#"><span>제목 표시</span></a>
       </div>
-      <div class="prepost-detail">
-        <pre>작성자 표시
-날짜 표시</pre>
-      </div>
-    </li>
-    <li class="prepost-wrapper">
-      <div class="prepost-title">
-        <pre>게시판 표시
-동적으로 목록 표시하기</pre>
-      </div>
-      <div class="prepost-detail">
-        <pre>작성자 표시
-날짜 표시</pre>
+      <div class="prepost prepost-detail">
+        <span>작성자 표시</span>
+        <br>
+        <span>날짜 표시</span>
       </div>
     </li>
-    <li class="prepost-wrapper">
-      <div class="prepost-title">
-        <pre>게시판 표시
-ㅁㄴㅇ 표시</pre>
-      </div>
-      <div class="prepost-detail">
-        <pre>작성자 표시
-날짜 표시</pre>
+    <li>
+      <div class="page">
+        <span id="page"></span>
       </div>
     </li>
   </ul>

@@ -20,6 +20,23 @@ var _boards = '';
 // 비동기 순서 체크용
 var test = 0;
 
+/****페이징****/
+
+// 한 페이지에 출력될 게시물 수
+const countPost = 10;
+// 한 페이지에 출력될 페이지 수
+const countPage = 10;
+// 총 페이지 수
+var totalPage = 0;
+// 표시 시작 페이지
+var startPage = 0;
+// 표시 끝 페이지
+var endPage = 0;
+// 현재 페이지
+var page = 5;
+
+/*************/
+
 /****************************************/
 
 
@@ -47,7 +64,7 @@ app.set('port', process.env.PORT || 3001);
 
 /***************라우팅*******************/
 
-app.get('/', function(req, res){
+app.get('/home', function(req, res){
  pool.getConnection(function(err, connection){
    if(err) throw err;
    else{
@@ -63,6 +80,35 @@ app.get('/', function(req, res){
    }
    connection.release();
  });
+});
+app.post('/home', function(req, res){
+  // 페이지 정보 구하는 부분 모듈화하기
+  pool.getConnection(function(err, connection){
+    if(err) throw err;
+    else{
+      connection.query('select count(*) as totalCount from post', function(err, rows){
+        totalPage = parseInt(rows[0].totalCount / countPage);
+        // 게시물이 남을 경우 페이지 하나 추가
+        if(rows[0].totalCount % countPage) totalPage += 1;
+
+        endPage = parseInt(req.body.cPage) + 3;
+        startPage = parseInt(req.body.cPage) - 3;
+
+        if(startPage < 1){
+          /* 현재 페이지를 기점으로 앞뒤 5페이지씩 출력. 앞쪽으로
+             출력할 페이지가 없으면 그 수만큼 페이지를 뒤쪽으로 더
+             출력해준다.*/
+          endPage -= startPage;
+          startPage = 1;
+        }
+        if(endPage>totalPage) endPage = totalPage;
+
+        console.log({cPage:req.body.cPage, sPage:startPage, ePage:endPage, tPage:totalPage});
+        connection.release();
+        res.send({cPage:req.body.cPage, sPage:startPage, ePage:endPage, tPage:totalPage});
+      });
+    }
+  });
 });
 
 app.get('/test', function(req, res){
