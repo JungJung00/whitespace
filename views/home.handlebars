@@ -3,29 +3,41 @@
  .handlebars와 app.js에서 렌더링 할 때 보내는 콘텍스트 객체를 핸들바가 합쳐
  html 파일로 출력한다.
 }}
+<script type="text/javascript">
+$(document).ready(function(){
+  // 일단 첫 페이지 로딩
+  pagingP('home', 1);
+
+  // TODO this snippet causes UItical error : should click twice to move page
+  // TODO If refresh site, return to first page //
+  // 페이지 번호 클릭시 로딩
+  $('.page-wrapper').click(function(event){
+    event.preventDefault();
+    $('.page').click(function(){
+      pagingP('home', $(this).text());
+      // pagingP('home', $(this).text());
+    });
+  });
+});
+</script>
 <div class="prepost-list-wrapper">
-  <ul>
-    <li class="prepost-wrapper">
-      <script type="text/javascript">
-        $(document).ready(function(){
-          paging('home');
-        });
-      </script>
-      <div class="prepost prepost-title">
-        <span>게시판 표시</span>
-        <br>
-        <a href="#"><span>제목 표시</span></a>
-      </div>
-      <div class="prepost prepost-detail">
-        <span>작성자 표시</span>
-        <br>
-        <span>날짜 표시</span>
-      </div>
-    </li>
-    <li>
-      <div class="page">
-        <span id="page"></span>
-      </div>
-    </li>
+  <ul id="prepost-template-target">
+    <script type="x-handlebars-template" id="prepost-template">
+      <li class="prepost-wrapper">
+        <div class="prepost prepost-title">
+          <span>{{this.brd_Title}}</span>
+          <br>
+          <a href="#"><span>{{this.pst_Title}}</span></a>
+        </div>
+        <div class="prepost prepost-detail">
+          <span>{{this.pst_Writer}}</span>
+          <br>
+          <span>{{this.pst_Date}}</span>
+        </div>
+      </li>
+    </script>
   </ul>
+  <div class="page-wrapper">
+    <span id="page"></span>
+  </div>
 </div>

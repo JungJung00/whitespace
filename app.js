@@ -81,12 +81,12 @@ app.get('/home', function(req, res){
    connection.release();
  });
 });
-app.post('/home', function(req, res){
+app.post('/homeN', function(req, res){
   // 페이지 정보 구하는 부분 모듈화하기
   pool.getConnection(function(err, connection){
     if(err) throw err;
     else{
-      connection.query('select count(*) as totalCount from post', function(err, rows){
+      connection.query('SELECT COUNT(*) AS totalCount FROM post', function(err, rows){
         totalPage = parseInt(rows[0].totalCount / countPage);
         // 게시물이 남을 경우 페이지 하나 추가
         if(rows[0].totalCount % countPage) totalPage += 1;
@@ -103,11 +103,24 @@ app.post('/home', function(req, res){
         }
         if(endPage>totalPage) endPage = totalPage;
 
-        console.log({cPage:req.body.cPage, sPage:startPage, ePage:endPage, tPage:totalPage});
+        console.log({cPage:parseInt(req.body.cPage), sPage:startPage, ePage:endPage, tPage:totalPage});
         connection.release();
-        res.send({cPage:req.body.cPage, sPage:startPage, ePage:endPage, tPage:totalPage});
+        res.json({cPage:parseInt(req.body.cPage), sPage:startPage, ePage:endPage, tPage:totalPage, test:'text?'});
       });
     }
+  });
+});
+app.post('/homeP', function(req, res){
+  pool.getConnection(function(err, connection){
+    // var prepost='{';
+    if(err) throw err;
+    connection.query('SELECT brd_Title, pst_Date, pst_Id, pst_Title, pst_View, pst_Writer FROM post LIMIT ?, 10', (parseInt(req.body.cPage)-1) * 10, function(err, rows){
+      // for(var i in rows){
+      //   prepost += '{brd_Title: ' + rows[i].brd_Title
+      // }
+      connection.release();
+      res.json(rows);
+    });
   });
 });
 
@@ -142,7 +155,7 @@ app.post('/returning', function(req, res) {
             // 아이디, 비밀번호 일치
             if(req.body.pwd == rows[0].mbr_Pwd){
               console.log('\n\nWelcome ' + rows[0].mbr_Nick + '!');
-              res.redirect('/');
+              res.redirect('/home');
             }
             // 비밀번호 불일치
             else{

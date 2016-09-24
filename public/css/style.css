@@ -3,7 +3,7 @@ html, body{
   margin: 0;
 }
 body{
-  background-color: #FFE8EE;
+  background-color: #f8f8f8;
 }
 
 a{
@@ -20,7 +20,8 @@ a{
   height: inherit;
   float:left;
 
-  background-color:#FF707E;
+  /*background-color:#FF707E;*/
+  background-color: #ff6f69;
   box-shadow: 3px 0px 10px gray;
 }
 #profile-wrapper img{
@@ -32,12 +33,12 @@ a{
 }
 #board li{
   height: 30px;
-  margin-bottom: 2px;
-  padding-left: 7px;
+  margin-bottom: 17px;
+  padding-left: 12px;
 
-  background-color: #FF5C67;
+  color: #f8f8f8;
   /*background-color: #FF4545;*/
-
+  font-size: 0.85em;
   font-weight: bold;
 }
 #devider{
