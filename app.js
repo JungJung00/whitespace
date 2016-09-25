@@ -64,29 +64,45 @@ app.set('port', process.env.PORT || 3001);
 
 /***************라우팅*******************/
 
-app.get('/home', function(req, res){
+// TODO delete this snippet
+app.get('/test', function(req, res){
+  res.render('test');
+});
+app.post('/test', function(req, res){
+  console.log(req.body.test);
+  res.redirect('/test');
+});
+
+app.get('/', function(req, res){
  pool.getConnection(function(err, connection){
    if(err) throw err;
    else{
      connection.query('select brd_Title from board', function(err, rows){
        _boards = '';
        for(var i in rows){
-         _boards += '<li>' + rows[i].brd_Title + '</li>';
+         _boards += '<li><a href="/front-door/"' + rows[i].brd_Title + ' class="board-list">' + rows[i].brd_Title + '</a></li>';
        }console.log('Get boards menu');
       // x  console.log(_boards);
        // getConnection 함수 밖에 렌더 함수를 쓰면 비동기 방식이기 때문에 게시판 항목을 모두 읽어오기 전 렌더링을 해버린다.
-       res.render('home', {boards: _boards});
+       res.render('front-door', {boards: _boards});
      });
    }
    connection.release();
  });
 });
-app.post('/homeN', function(req, res){
-  // 페이지 정보 구하는 부분 모듈화하기
+app.get('/front-door/:board', function(req, res){
+
+});
+app.post('/Page', function(req, res){
+  // TODO 중복 코드 모듈화 가능한지 생각 : 그냥 통짜로 모듈화 했을 땐 rows 등의 변수를 사용 못함
+  // ** 익명함수 function(req, res){...}를 모듈화 하는 방법. -> 모듈 함수에 인자를 req, res로ㅇㅇ
   pool.getConnection(function(err, connection){
     if(err) throw err;
-    else{
+
+    if(req.body.cBoard == 'front-door'){
       connection.query('SELECT COUNT(*) AS totalCount FROM post', function(err, rows){
+        if (err) throw err;
+
         totalPage = parseInt(rows[0].totalCount / countPage);
         // 게시물이 남을 경우 페이지 하나 추가
         if(rows[0].totalCount % countPage) totalPage += 1;
@@ -105,31 +121,56 @@ app.post('/homeN', function(req, res){
 
         console.log({cPage:parseInt(req.body.cPage), sPage:startPage, ePage:endPage, tPage:totalPage});
         connection.release();
-        res.json({cPage:parseInt(req.body.cPage), sPage:startPage, ePage:endPage, tPage:totalPage, test:'text?'});
+        res.json({cPage:parseInt(req.body.cPage), sPage:startPage, ePage:endPage, tPage:totalPage});
+      });
+    }
+    else{
+      connection.query('SELECT COUNT(*) AS totalCount FROM post WHERE brd_Title = ?', req.body.cBoard, function(err, rows){
+        if(err) throw err;
+
+        totalPage = parseInt(rows[0].totalCount / countPage);
+        // 게시물이 남을 경우 페이지 하나 추가
+        if(rows[0].totalCount % countPage) totalPage += 1;
+
+        endPage = parseInt(req.body.cPage) + 3;
+        startPage = parseInt(req.body.cPage) - 3;
+
+        if(startPage < 1){
+          /* 현재 페이지를 기점으로 앞뒤 5페이지씩 출력. 앞쪽으로
+          출력할 페이지가 없으면 그 수만큼 페이지를 뒤쪽으로 더
+          출력해준다.*/
+          endPage -= startPage;
+          startPage = 1;
+        }
+        if(endPage>totalPage) endPage = totalPage;
+
+        console.log({cPage:parseInt(req.body.cPage), sPage:startPage, ePage:endPage, tPage:totalPage});
+        connection.release();
+        res.json({cPage:parseInt(req.body.cPage), sPage:startPage, ePage:endPage, tPage:totalPage});
       });
     }
   });
 });
-app.post('/homeP', function(req, res){
+app.post('/Post', function(req, res){
   pool.getConnection(function(err, connection){
-    // var prepost='{';
     if(err) throw err;
-    connection.query('SELECT brd_Title, pst_Date, pst_Id, pst_Title, pst_View, pst_Writer FROM post LIMIT ?, 10', (parseInt(req.body.cPage)-1) * 10, function(err, rows){
-      // for(var i in rows){
-      //   prepost += '{brd_Title: ' + rows[i].brd_Title
-      // }
-      connection.release();
-      res.json(rows);
-    });
-  });
-});
+    if(req.body.cBoard == 'front-door'){
+      connection.query('SELECT brd_Title, pst_Date, pst_Id, pst_Title, pst_View, pst_Writer FROM post LIMIT ?, 10', (parseInt(req.body.cPage)-1) * 10, function(err, rows){
+        if(err) throw err;
 
-app.get('/test', function(req, res){
-  res.render('test');
-});
-app.post('/test', function(req, res){
-  console.log(req.body.test);
-  res.redirect('/test');
+        res.json(rows);
+        connection.release();
+      });
+    }
+    else{
+      connection.query('SELECT brd_Title, pst_Date, pst_Id, pst_Title, pst_View, pst_Writer FROM post WHERE brd_Title = ? LIMIT ?, 10', [req.body.cBoard, (parseInt(req.body.cPage)-1) * 10], function(err, rows){
+        if(err) throw err;
+
+        res.json(rows);
+        connection.release();
+      });
+    }
+  });
 });
 
 app.get('/returning', function(req, res){
@@ -155,7 +196,7 @@ app.post('/returning', function(req, res) {
             // 아이디, 비밀번호 일치
             if(req.body.pwd == rows[0].mbr_Pwd){
               console.log('\n\nWelcome ' + rows[0].mbr_Nick + '!');
-              res.redirect('/home');
+              res.redirect('/');
             }
             // 비밀번호 불일치
             else{

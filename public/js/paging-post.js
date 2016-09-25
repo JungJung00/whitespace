@@ -15,9 +15,9 @@ function pagingP(board, _cPage){
   });
 
   $.ajax({
-    url: '/' + board + 'P',
+    url: '/Post',
     type: 'post',
-    data: {cPage: _cPage},
+    data: {cBoard: board, cPage: _cPage},
     dataType: 'json',
     success: function(data){
       $.each(data, function(index, value){

@@ -6,7 +6,7 @@
 <script type="text/javascript">
 $(document).ready(function(){
   // 일단 첫 페이지 로딩
-  pagingP('home', 1);
+  pagingP('front-door', 1);
 
   // TODO this snippet causes UItical error : should click twice to move page
   // TODO If refresh site, return to first page //
@@ -14,30 +14,21 @@ $(document).ready(function(){
   $('.page-wrapper').click(function(event){
     event.preventDefault();
     $('.page').click(function(){
-      pagingP('home', $(this).text());
-      // pagingP('home', $(this).text());
+      event.preventDefault();
+      pagingP('front-door', $(this).text());
     });
+  });
+  $('.board-list').click(function(event){
+    event.preventDefault();
+    alert('sad');
   });
 });
 </script>
 <div class="prepost-list-wrapper">
   <ul id="prepost-template-target">
-    <script type="x-handlebars-template" id="prepost-template">
-      <li class="prepost-wrapper">
-        <div class="prepost prepost-title">
-          <span>{{this.brd_Title}}</span>
-          <br>
-          <a href="#"><span>{{this.pst_Title}}</span></a>
-        </div>
-        <div class="prepost prepost-detail">
-          <span>{{this.pst_Writer}}</span>
-          <br>
-          <span>{{this.pst_Date}}</span>
-        </div>
-      </li>
-    </script>
+    <!-- prepost -->
   </ul>
-  <div class="page-wrapper">
-    <span id="page"></span>
-  </div>
+  <ul id="page" class="page-wrapper">
+    <!-- page -->
+  </ul>
 </div>
