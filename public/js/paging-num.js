@@ -9,24 +9,6 @@ function pagingN(board, _cPage){
         $('#page').empty();
 
         // 페이지 표시
-        // if(data['cPage'] >= 5) $('#page').append('<li><a href="/' + board + '/1" class="page active-page">1</a></li> ');
-        // if(data['cPage'] >= 6) $('#page').append('<li><a href="/' + board + '/' + (data['sPage'] - 1) + '" class="page inactive-page">...</a></li> ');
-        //
-        // for(var i = data['sPage']; i <= data['ePage']; i++){
-        //   if(i == data['cPage'])
-        //     // 현재 페이지를 다시 눌렀을 때 또 값을 불러올 필요는 없으므로 경로 제거
-        //     $('#page').append('<li><a class="page inactive-page"><b>' + i + '</b></a></li> ');
-        //   else{
-        //     $('#page').append('<li><a href="/' + board + '/' + i + '" class="page inactive-page">' + i + '</a></li> ');
-        //     if(i == data['ePage'] && data['tPage']>data['ePage'] + 1){
-        //       $('#page').append('<li><a href="/' + board + '/' + (data['ePage'] + 1) + '" class="page inactive-page">...</a></li> ');
-        //     }
-        //   }
-        // }
-        // if(data['tPage']-data['cPage'] >= 4){
-        //   $('#page').append('<li><a href="/' + board + '/' + data['tPage'] + '" class="page inactive-page">' + data['tPage'] + '</a></li>');
-        // }
-        
         if(data['sPage'] >= 2){
           $('#page').append('<li><a href="/' + board + '/1" class="page inactive-page">1</a></li> ');
           if(data['sPage'] > 2){
@@ -38,14 +20,18 @@ function pagingN(board, _cPage){
             $('#page').append('<li><a class="page active-page"><b>' + i + '</b></a></li> ');
           }
           else{
-            $('#page').append('<li><a href="/' + board + '/' + i + '" class="page active-page">' + i + '</a></li> ');
+            $('#page').append('<li><a href="/' + board + '/' + i + '" class="page inactive-page">' + i + '</a></li> ');
           }
         }
         if(data['tPage'] - data['cPage'] >= 4){
           if(data['tPage'] - data['cPage'] > 4){
-            $('#page').append('<li><a href="/' + board + '/' + (data['ePage'] + 1) + '" class="page active-page">...</a></li> ');
+            $('#page').append('<li><a href="/' + board + '/' + (data['ePage'] + 1) + '" class="page inactive-page">...</a></li> ');
           }
-          $('#page').append('<li><a href="/' + board + '/' + data['tPage'] + '" class="page active-page">' + data['tPage'] + '</a></li> ');
+          $('#page').append('<li><a href="/' + board + '/' + data['tPage'] + '" class="page inactive-page">' + data['tPage'] + '</a></li> ');
+        }
+
+        if(data['ePage'] == 0 || data['tPage'] == 0){
+          $('#page').append('<li><a class="page active-page">1</a></li> ');
         }
       });
     }

@@ -28,6 +28,9 @@ function pagingP(board, _cPage){
         prepost += template(value);
         console.log('\n'+'prepost : ' + prepost);
       });
+      if(data.length == 0){
+        prepost = template({pst_Id: 0, brd_Title: board, pst_Title: 'There is no post yet! Do share your life', pst_Writer: 'JungJung', pst_Date: '0000-00-00T00:00:00'});
+      }
       prepostList.html(prepost);
     }
   });

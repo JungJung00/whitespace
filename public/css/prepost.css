@@ -21,7 +21,7 @@
   border: solid gray 1px;
 }
 .prepost{
-  height: 42px;
+  height: 52px;
   overflow: hidden;
 }
 .prepost-title{
@@ -38,6 +38,12 @@
 }
 .prepost span{
   padding-left : 5px;
+}
+.prepost-normal{
+
+}
+.prepost-small{
+  font-size: 0.8em;
 }
 .page-wrapper{
   width: 660px;

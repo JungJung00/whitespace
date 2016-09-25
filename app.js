@@ -119,6 +119,7 @@ app.post('/Page', function(req, res){
         console.log({cPage:parseInt(req.body.cPage), sPage:startPage, ePage:endPage, tPage:totalPage});
         connection.release();
         res.json({cPage:parseInt(req.body.cPage), sPage:startPage, ePage:endPage, tPage:totalPage});
+
       });
     }
     else{
