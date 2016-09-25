@@ -15,12 +15,15 @@ $(document).ready(function(){
     event.preventDefault();
     $('.page').click(function(){
       event.preventDefault();
-      pagingP('front-door', $(this).text());
+      // 현재 선택된 게시판의 게시글을 가져온다.
+      pagingP($('.active-board').text(), $(this).text());
     });
   });
+
   $('.board-list').click(function(event){
     event.preventDefault();
-    alert('sad');
+    alert($('.active-page').text());
+    pagingP($('.active-board').text(), parseInt($('.active-page').text()));
   });
 });
 </script>
