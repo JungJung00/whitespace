@@ -1,7 +1,6 @@
 // 최초로 실행되는 애플리케이션 = 엔트리
 
 /*****************변수*******************/
-
 var express = require('express');
 var app = express();
 var handlebars = require('express-handlebars').create({defaultLayout:'main'});
@@ -73,14 +72,74 @@ app.post('/test', function(req, res){
   res.redirect('/test');
 });
 
+app.get('/outside/returning', function(req, res){
+ res.render('returning', {layout: 'none'});
+})
+app.post('/outside/returning', function(req, res) {
+  pool.getConnection(function(err, connection){
+    if(err) throw err;
+    else{
+      // 로그인 처리
+      connection.query('select * from member where mbr_Id = ?', req.body.id, function(err, rows){
+        if(err){
+          console.log('Query Error: ' + err);
+          redirect('/outside/returning');
+        }
+        else{
+          // 아이디 불일치
+          if(rows.length == 0){
+            console.log('\n\nThere is no ID that you typed');
+            res.redirect('/outside/returning');
+          }
+          else{
+            // 아이디, 비밀번호 일치
+            if(req.body.pwd == rows[0].mbr_Pwd){
+              console.log('\n\nWelcome ' + rows[0].mbr_Nick + '!');
+              res.redirect('/');
+            }
+            // 비밀번호 불일치
+            else{
+              console.log('\n\nWrong password!');
+              res.redirect('/outside/returning');
+            }
+          }
+        }
+      });
+      connection.release();
+    }
+  });
+});
+
+app.get('/outside/moving', function(req, res){
+  res.render('moving', {layout: 'none'});
+});
+app.post('/outside/moving', function(req, res){
+  var filter = require('./public/js/datafilter.js');
+  var check = false;
+  pool.getConnection(function(err, connection){
+    check = filter.dataFilter(req.body, connection);
+    if(err) throw err;
+    else if(check){
+      bd = req.body;
+      dbSet = {mbr_Id: req.body.id, mbr_Pwd: req.body.pwd, mbr_Nick: req.body.nick, mbr_EMail: req.body.email};
+      connection.query("INSERT INTO member SET ?", dbSet,
+      function(err, rows){if(err) console.log('Query Error: ' + err); else console.log('Query Success');});
+    }
+    connection.release();
+  });
+  console.log(req.body);
+  if(check) res.redirect('/outside/returning');
+  else res.redirect('/outside/moving');
+});
+
 app.get('/', function(req, res){
  pool.getConnection(function(err, connection){
    if(err) throw err;
    else{
      connection.query('select brd_Title from board', function(err, rows){
-       _boards = '<li><a href="/" class="board-list active-board">front-door</a></li>';
+       _boards = '<li><a href="/" class="room-list active-board">front-door</a></li>';
        for(var i in rows){
-         _boards += '<li><a href="/front-door/"' + rows[i].brd_Title + ' class="board-list inactive-board">' + rows[i].brd_Title + '</a></li>';
+         _boards += '<li><a href="/front-door/"' + rows[i].brd_Title + ' class="room-list inactive-board">' + rows[i].brd_Title + '</a></li>';
        }console.log('Get boards menu');
       // x  console.log(_boards);
        // getConnection 함수 밖에 렌더 함수를 쓰면 비동기 방식이기 때문에 게시판 항목을 모두 읽어오기 전 렌더링을 해버린다.
@@ -171,61 +230,9 @@ app.post('/Post', function(req, res){
   });
 });
 
-app.get('/returning', function(req, res){
- res.render('returning', {layout: 'none'});
-})
-app.post('/returning', function(req, res) {
-  pool.getConnection(function(err, connection){
-    if(err) throw err;
-    else{
-      // 로그인 처리
-      connection.query('select * from member where mbr_Id = ?', req.body.id, function(err, rows){
-        if(err){
-          console.log('Query Error: ' + err);
-          redirect('/returning');
-        }
-        else{
-          // 아이디 불일치
-          if(rows.length == 0){
-            console.log('\n\nThere is no ID that you typed');
-            res.redirect('/returning');
-          }
-          else{
-            // 아이디, 비밀번호 일치
-            if(req.body.pwd == rows[0].mbr_Pwd){
-              console.log('\n\nWelcome ' + rows[0].mbr_Nick + '!');
-              res.redirect('/');
-            }
-            // 비밀번호 불일치
-            else{
-              console.log('\n\nWrong password!');
-              res.redirect('/returning');
-            }
-          }
-        }
-        connection.release();
-      });
-    }
-  });
-});
+app.post('/outside/building-room', function(req, res){
 
-app.get('/moving', function(req, res){
-  res.render('moving', {layout: 'none'});
-});
-app.post('/moving', function(req, res){
-  pool.getConnection(function(err, connection){
-    if(err) throw err;
-    else{
-      bd = req.body;
-      dbSet = {mbr_Id: req.body.id, mbr_Pwd: req.body.pwd, mbr_Nick: req.body.nick, mbr_EMail: req.body.email};
-      connection.query("INSERT INTO member SET ?", dbSet,
-      function(err, rows){if(err) console.log('Query Error: ' + err); else console.log('Query Success');});
-  }
-    connection.release();
-  });
-  console.log(req.body);
-  res.redirect('/returning');
-});
+})
 
 /***************************************/
 

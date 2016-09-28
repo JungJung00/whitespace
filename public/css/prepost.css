@@ -1,6 +1,6 @@
 /***********content***********/
 .prepost-list-wrapper{
-  width: 662px;
+  width: 700px;
   height: auto;
   margin: auto;
   margin-top: 30px;
@@ -25,13 +25,13 @@
   overflow: hidden;
 }
 .prepost-title{
-  width: 480px;
+  width: 499px;
   float: left;
 
   background-color: rgba(51,0,46,0.1);
 }
 .prepost-detail{
-  width: 180px;
+  width: 199px;
   float: left;
 
   background-color: rgba(115, 113, 40, 0.1);

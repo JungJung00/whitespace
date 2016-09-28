@@ -16,13 +16,11 @@ a{
 /******aside********/
 #main-aside{
   width: 17%;
-  max-width: 210px;
-  min-width: 170px;
   height: inherit;
   float:left;
 
   /*background-color:#FF707E;*/
-  background-color: #ff6f69;
+  background-color: #FF4040;
   box-shadow: 3px 0px 10px gray;
 }
 #profile-wrapper img{
@@ -32,13 +30,13 @@ a{
   margin-top: 0px;
   padding-left: 0px;
 }
-#board li{
-  height: 30px;
-  margin-bottom: 17px;
-  padding-left: 12px;
+#board a{
+  padding: 12px 16px;
+  display: block;
 
-  color: #f8f8f8;
-  /*background-color: #FF4545;*/
+  color: #000;
+  text-decoration: none;
+
   font-size: 0.85em;
   font-weight: bold;
 }
@@ -46,6 +44,16 @@ a{
   height: 80px !important;
   margin-top: 15px;
   margin-bottom: 19px !important;
+}
+#board a.active-board{
+  background-color: #A80000;
+  box-shadow: 0px 1px 3px gray inset;
+  color: white;
+}
+#board a:hover:not(.active-board){
+  background-color: #A80000;
+  box-shadow: 0px 1px 3px gray inset;
+  color: white;
 }
 /*******************/
 

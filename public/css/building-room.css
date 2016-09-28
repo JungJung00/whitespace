@@ -1,0 +1,37 @@
+.building-room-wrapper li{
+  text-align: center;
+}
+.building-text{
+  width: 100%;
+  padding: 12px 0 12px 10px;
+  margin: 3px 0;
+
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+
+  -webkit-input-transition: 0.5s;
+  transition: 0.5s;
+  outline: none;
+
+  background-color: rgba(0,0,0,0);
+  font-size: 14px;
+}
+.building-text:focus{
+  border: 2px solid #555;
+}
+#form-opened{
+  border-top: none;
+}
+#form-opened>div{
+  float: left;
+  width: 100%;
+  box-sizing: border-box;
+}
+textarea {
+  height: 150px;
+  padding: 12px 20px;
+  background-color: #f8f8f8;
+  font-family: Arial;
+  resize: none;
+}
