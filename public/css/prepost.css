@@ -1,0 +1,65 @@
+/***********content***********/
+.prepost-list-wrapper{
+  width: 700px;
+  height: auto;
+  margin: auto;
+  margin-top: 30px;
+}
+.prepost-list-wrapper ul{
+  padding: 0px;
+}
+.prepost-list-wrapper ul li:first-child{
+  border-top: solid gray 1px ;
+}
+.prepost-list-wrapper ul li{
+  /*fix height become always 0px*/
+  overflow: hidden;
+  border-top: 0px;
+}
+.prepost-wrapper{
+  margin-bottom: 0px;
+  border: solid gray 1px;
+}
+.prepost{
+  height: 52px;
+  overflow: hidden;
+}
+.prepost-title{
+  width: 499px;
+  float: left;
+
+  background-color: rgba(51,0,46,0.1);
+}
+.prepost-detail{
+  width: 199px;
+  float: left;
+
+  background-color: rgba(115, 113, 40, 0.1);
+}
+.prepost span{
+  padding-left : 5px;
+}
+.prepost-normal{
+
+}
+.prepost-small{
+  font-size: 0.8em;
+}
+.page-wrapper{
+  width: 660px;
+  height: 22px;
+
+  text-align: center;
+}
+#page li{
+  /* TODO display 속성 자세히 파악하기 */
+  display: inline;
+
+  border: none;
+}
+/*****************************/
+
+/*
+  보통 div width를 고정으로 하는건가?
+  %로 하지 않더라도 device 별로 div들의 css를 조정하면 번거롭지만 충분히 반응형 웹을 만들 수 있을 것이라고 생각한다.
+*/

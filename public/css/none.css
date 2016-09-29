@@ -1,46 +1,10 @@
-#content-wrapper{
+.content-wrapper{
   width: 100%;
 }
 
-/**************form basic***************/
-
-.form-input{
-  text-align: center;
-
-  border-style: solid;
-  border-radius: 10px;
-  /*border-color:rgb(248, 200, 250);*/
-  border-color: #FA6E75;
-
-  background-color: rgba(0,0,0,0);
-}
-
-/****************************************/
-
-
-/***********plcaeholder color************/
-
-::-webkit-input-placeholder { /* WebKit, Blink, Edge */
-    color: #FA6E75;
-}
-:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-   color: #FA6E75;
-   opacity:  1;
-}
-::-moz-placeholder { /* Mozilla Firefox 19+ */
-   color: #FA6E75;
-   opacity:  1;
-}
-:-ms-input-placeholder { /* Internet Explorer 10-11 */
-   color: #FA6E75;
-}
-
-/****************************************/
-
-
 /*****************content****************/
 .enter{
-  color: #FA6E75  
+  color: #FF4040;
 }
 h3{
   word-spacing: 3px;

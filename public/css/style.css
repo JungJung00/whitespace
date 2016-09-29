@@ -3,17 +3,24 @@ html, body{
   margin: 0;
 }
 body{
-  background-color: #FFE8EE;
+  background-color: #f8f8f8;
 }
+
+a{
+  text-decoration: none;
+  color: blue;
+}
+
 /******************/
 
 /******aside********/
 #main-aside{
-  width: 230px;
+  width: 17%;
   height: inherit;
   float:left;
 
-  background-color:#FF707E;
+  /*background-color:#FF707E;*/
+  background-color: #FF4040;
   box-shadow: 3px 0px 10px gray;
 }
 #profile-wrapper img{
@@ -22,17 +29,15 @@ body{
 #board{
   margin-top: 0px;
   padding-left: 0px;
-
-  list-style: none;
 }
-#board li{
-  height: 30px;
-  margin-bottom: 2px;
-  padding-left: 10px;
+#board a{
+  padding: 12px 16px;
+  display: block;
 
-  background-color: #FF5C67;
-  /*background-color: #FF4545;*/
+  color: #000;
+  text-decoration: none;
 
+  font-size: 0.85em;
   font-weight: bold;
 }
 #devider{
@@ -40,12 +45,26 @@ body{
   margin-top: 15px;
   margin-bottom: 19px !important;
 }
+#board a.active-board{
+  background-color: #A80000;
+  box-shadow: 0px 1px 4px #4D0005 inset;
+  color: white;
+}
+#board a:hover:not(.active-board){
+  background-color: #A80000;
+  box-shadow: 0px 1px 4px #4D0005 inset;
+  color: white;
+}
 /*******************/
 
 /******content*****/
-#content-wrapper{
-  width: ;
+.content-wrapper{
+  width: 83%;
   height:inherit;
   float:left;
+}
+
+ul{
+  list-style: none;
 }
 /******************/

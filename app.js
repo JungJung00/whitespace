@@ -1,11 +1,9 @@
 // 최초로 실행되는 애플리케이션 = 엔트리
 
 /*****************변수*******************/
-
 var express = require('express');
 var app = express();
 var handlebars = require('express-handlebars').create({defaultLayout:'main'});
-// const $ = require('jquery')(window);
 var mysql = require('mysql');
 // 커넥션 풀 생성 : 필요할 때마다 연결
 var pool = mysql.createPool({
@@ -16,14 +14,27 @@ var pool = mysql.createPool({
   database: 'whitespace',
   connectionLimit: 10
 });
-// 데이터베이스 연결 설정
+// 게시판 목록 저장
+var _boards = '';
+// 비동기 순서 체크용
+var test = 0;
 
-var fortunes = [
- "Conquer your fears or they will conquer you",
- "Rivers need springs",
- "Do not fear what you don't know",
- "Whenever possible, keep it simple"
-];
+/****페이징****/
+
+// 한 페이지에 출력될 게시물 수
+const countPost = 10;
+// 한 페이지에 출력될 페이지 수
+const countPage = 10;
+// 총 페이지 수
+var totalPage = 0;
+// 표시 시작 페이지
+var startPage = 0;
+// 표시 끝 페이지
+var endPage = 0;
+// 현재 페이지
+var page = 5;
+
+/*************/
 
 /****************************************/
 
@@ -46,16 +57,13 @@ app.set('port', process.env.PORT || 3001);
   // pool.getConnection(function(err, cnct){
   //   내용
   // })
+
 /****************************************/
 
 
 /***************라우팅*******************/
 
-app.get('/', function(req, res){
- // 뷰 엔진에서 콘텐츠 타입 text/html과 상태 코드 200을 반환하므로 명시하지 않는다.
- res.render('home');
-});
-
+// TODO delete this snippet
 app.get('/test', function(req, res){
   res.render('test');
 });
@@ -64,10 +72,10 @@ app.post('/test', function(req, res){
   res.redirect('/test');
 });
 
-app.get('/returning', function(req, res){
+app.get('/outside/returning', function(req, res){
  res.render('returning', {layout: 'none'});
 })
-app.post('/returning', function(req, res) {
+app.post('/outside/returning', function(req, res) {
   pool.getConnection(function(err, connection){
     if(err) throw err;
     else{
@@ -75,51 +83,157 @@ app.post('/returning', function(req, res) {
       connection.query('select * from member where mbr_Id = ?', req.body.id, function(err, rows){
         if(err){
           console.log('Query Error: ' + err);
-          redirect('/returning');
+          redirect('/outside/returning');
         }
         else{
+          // 아이디 불일치
           if(rows.length == 0){
             console.log('\n\nThere is no ID that you typed');
-            res.redirect('/returning');
+            res.redirect('/outside/returning');
           }
           else{
+            // 아이디, 비밀번호 일치
             if(req.body.pwd == rows[0].mbr_Pwd){
               console.log('\n\nWelcome ' + rows[0].mbr_Nick + '!');
-              res.redirect('/home');
+              res.redirect('/');
             }
+            // 비밀번호 불일치
             else{
               console.log('\n\nWrong password!');
-              res.redirect('/returning');
+              res.redirect('/outside/returning');
             }
           }
         }
+      });
+      connection.release();
+    }
+  });
+});
+
+app.get('/outside/moving', function(req, res){
+  res.render('moving', {layout: 'none'});
+});
+app.post('/outside/moving', function(req, res){
+  var filter = require('./public/js/datafilter.js');
+  var check = false;
+  pool.getConnection(function(err, connection){
+    check = filter.dataFilter(req.body, connection);
+    if(err) throw err;
+    else if(check){
+      bd = req.body;
+      dbSet = {mbr_Id: req.body.id, mbr_Pwd: req.body.pwd, mbr_Nick: req.body.nick, mbr_EMail: req.body.email};
+      connection.query("INSERT INTO member SET ?", dbSet,
+      function(err, rows){if(err) console.log('Query Error: ' + err); else console.log('Query Success');});
+    }
+    connection.release();
+  });
+  console.log(req.body);
+  if(check) res.redirect('/outside/returning');
+  else res.redirect('/outside/moving');
+});
+
+app.get('/', function(req, res){
+ pool.getConnection(function(err, connection){
+   if(err) throw err;
+   else{
+     connection.query('select brd_Title from board', function(err, rows){
+       _boards = '<li><a href="/" class="room-list active-board">front-door</a></li>';
+       for(var i in rows){
+         _boards += '<li><a href="/front-door/"' + rows[i].brd_Title + ' class="room-list inactive-board">' + rows[i].brd_Title + '</a></li>';
+       }console.log('Get boards menu');
+      // x  console.log(_boards);
+       // getConnection 함수 밖에 렌더 함수를 쓰면 비동기 방식이기 때문에 게시판 항목을 모두 읽어오기 전 렌더링을 해버린다.
+       res.render('front-door', {boards: _boards});
+     });
+   }
+   connection.release();
+ });
+});
+app.post('/Page', function(req, res){
+  // TODO 중복 코드 모듈화 가능한지 생각 : 그냥 통짜로 모듈화 했을 땐 rows 등의 변수를 사용 못함
+  // ** 익명함수 function(req, res){...}를 모듈화 하는 방법. -> 모듈 함수에 인자를 req, res로ㅇㅇ
+  pool.getConnection(function(err, connection){
+    if(err) throw err;
+
+    if(req.body.cBoard == 'front-door'){
+      connection.query('SELECT COUNT(*) AS totalCount FROM post', function(err, rows){
+        if (err) throw err;
+
+        totalPage = parseInt(rows[0].totalCount / countPage);
+        // 게시물이 남을 경우 페이지 하나 추가
+        if(rows[0].totalCount % countPage) totalPage += 1;
+
+        endPage = parseInt(req.body.cPage) + 3;
+        startPage = parseInt(req.body.cPage) - 3;
+
+        if(startPage < 1){
+          /* 현재 페이지를 기점으로 앞뒤 5페이지씩 출력. 앞쪽으로
+             출력할 페이지가 없으면 그 수만큼 페이지를 뒤쪽으로 더
+             출력해준다.*/
+          endPage -= startPage;
+          startPage = 1;
+        }
+        if(endPage>totalPage) endPage = totalPage;
+
+        console.log({cPage:parseInt(req.body.cPage), sPage:startPage, ePage:endPage, tPage:totalPage});
+        connection.release();
+        res.json({cPage:parseInt(req.body.cPage), sPage:startPage, ePage:endPage, tPage:totalPage});
+
+      });
+    }
+    else{
+      connection.query('SELECT COUNT(*) AS totalCount FROM post WHERE brd_Title = ?', req.body.cBoard, function(err, rows){
+        if(err) throw err;
+
+        totalPage = parseInt(rows[0].totalCount / countPage);
+        // 게시물이 남을 경우 페이지 하나 추가
+        if(rows[0].totalCount % countPage) totalPage += 1;
+
+        endPage = parseInt(req.body.cPage) + 3;
+        startPage = parseInt(req.body.cPage) - 3;
+
+        if(startPage < 1){
+          /* 현재 페이지를 기점으로 앞뒤 5페이지씩 출력. 앞쪽으로
+          출력할 페이지가 없으면 그 수만큼 페이지를 뒤쪽으로 더
+          출력해준다.*/
+          endPage -= startPage;
+          startPage = 1;
+        }
+        if(endPage>totalPage) endPage = totalPage;
+
+        console.log({cPage:parseInt(req.body.cPage), sPage:startPage, ePage:endPage, tPage:totalPage});
+        connection.release();
+        res.json({cPage:parseInt(req.body.cPage), sPage:startPage, ePage:endPage, tPage:totalPage});
+      });
+    }
+  });
+});
+app.post('/Post', function(req, res){
+  pool.getConnection(function(err, connection){
+    if(err) throw err;
+    if(req.body.cBoard == 'front-door'){
+      connection.query('SELECT brd_Title, pst_Date, pst_Id, pst_Title, pst_View, pst_Writer FROM post LIMIT ?, 10', (parseInt(req.body.cPage)-1) * 10, function(err, rows){
+        if(err) throw err;
+
+        res.json(rows);
+        connection.release();
+      });
+    }
+    else{
+      connection.query('SELECT brd_Title, pst_Date, pst_Id, pst_Title, pst_View, pst_Writer FROM post WHERE brd_Title = ? LIMIT ?, 10', [req.body.cBoard, (parseInt(req.body.cPage)-1) * 10], function(err, rows){
+        if(err) throw err;
+
+        res.json(rows);
         connection.release();
       });
     }
   });
 });
 
-app.get('/moving', function(req, res){
-  res.render('moving', {layout: 'none'});
-});
-app.post('/moving', function(req, res){
-  pool.getConnection(function(err, connection){
-    if(err) throw err;
-    else{
-      bd = req.body;
-      dbSet = {mbr_Id: req.body.id, mbr_Pwd: req.body.pwd, mbr_Nick: req.body.nick, mbr_EMail: req.body.email};
-      connection.query("INSERT INTO member SET ?", dbSet,
-      function(err, rows){if(err) console.log('Query Error: ' + err); else console.log('Query Success');});
-  }
-    connection.release();
-  });
-  console.log(req.body);
-  res.redirect('/returning');
-});
+app.post('/outside/building-room', function(req, res){
 
-app.get('/home', function(req, res){
-  res.render('home');
-});
+})
+
 /***************************************/
 
 

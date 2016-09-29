@@ -1,0 +1,48 @@
+{{!
+.handlebars = 템플릿
+ .handlebars와 app.js에서 렌더링 할 때 보내는 콘텍스트 객체를 핸들바가 합쳐
+ html 파일로 출력한다.
+}}
+<script type="text/javascript">
+$(document).ready(function(){
+  // 일단 첫 페이지 로딩
+  pagingP('front-door', 1);
+
+  // TODO this snippet causes UItical error : should click twice to move page
+  // TODO If refresh site, return to first page //
+  // 페이지 번호 클릭시 로딩
+  $('.page-wrapper').click(function(event){
+    event.preventDefault();
+    $('.page').click(function(){
+      event.preventDefault();
+      // 현재 선택된 게시판의 게시글을 가져온다.
+      pagingP($('.active-board').text(), $(this).text());
+    });
+  });
+
+  $('.room-list').click(function(event){
+    event.preventDefault();
+    // 선택한 게시판이 현재 게시판이면 클래스를 조작하지 않는다.
+    // TODO 후에 선택된 게시판은 다시 선택할 수 없도록 변경 => href 지우면 되나? css도 좀 바꿔주고
+    if(!$(this).hasClass('active-board')){
+      $('.active-board').removeClass('active-board').addClass('inactive-board');
+      $(this).removeClass('inactive-board').addClass('active-board');
+    }
+    // 다른 게시판으로 넘어가면 1쪽으로 이동.
+    pagingP($('.active-board').text(), 1);
+  });
+
+  $('#building-room').click(function(event){
+    event.preventDefault();
+    buildingRoom();
+  })
+});
+</script>
+<div class="prepost-list-wrapper">
+  <ul id="prepost-template-target">
+    <!-- as well as prepost, content -->
+  </ul>
+  <ul id="page" class="page-wrapper">
+    <!-- page -->
+  </ul>
+</div>

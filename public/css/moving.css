@@ -1,17 +1,17 @@
 #burden-wrapper{
   max-width: 600px;
   margin: auto;
-  margin-top: 30px;
+  margin-top: 115px;
+}
+#burden-wrapper span{
   text-align: center;
 }
-
 /***************form***************/
 input:first-child{
   margin-top: 0px;
 }
 .form-moving{
-  width: 400px;
-  height: 40px;
+  width: 100%;
   margin-top: 30px;
 }
 

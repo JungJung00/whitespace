@@ -4,9 +4,17 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Do it!</title>
+    <meta name="keyword" content="community, communication, blog, personality, hobby, share, friend, hang out, beautiful site">
+    <meta name="description" content="Community Site About Everything For Everyone">
+    <title>Hang out with us</title>
     <!-- css -->
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/input.css">
+    <link rel="stylesheet" href="/css/prepost.css">
+    <link rel="stylesheet" href="/css/building-room.css">
+    <!-- javascript  -->
+    <script type="text/javascript" src="/js/jquery-3.1.0.min.js"></script>
+    <script type="text/javascript" src="/js/handlebars-v4.0.5.js"></script>
 </head>
 
 <body>
@@ -17,17 +25,17 @@
         <div id="board-wrapper">
             <ul id="board">
                 <li id="devider">내 정보나, 로그아웃 버튼이나 뭐든... 세로 가운데로 맞춰주고/또는 비우고 목록만</li>
-                <li><span>아이스크림</span></li>
-                <li><span>작도</span></li>
-                <li><span>얘넨 동적으로 생성</span></li>
-                <li><span>마우스 호버시 색깔 변경</span></li>
+                {{{boards}}}
+                <li><a id="building-room" href="/outside/building-room">게시판 추가 만들고 꾸며</a></li>
             </ul>
         </div>
     </aside>
-    <div id="content-wrapper">
+    <div class="content-wrapper">
         {{{body}}}
     </div>
-    <script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script type="text/javascript" src="/js/paging-num.js"></script>
+    <script type="text/javascript" src="/js/paging-post.js"></script>
+    <script type="text/javascript" src="/js/building-room.js"></script>
 </body>
 
 </html>
