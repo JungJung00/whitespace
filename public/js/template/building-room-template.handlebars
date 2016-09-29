@@ -1,14 +1,15 @@
 <div class="building-room-wrapper">
   <form id="building-room-form" class="" action="" method="post">
     <li id="form-opened">
-      <div class="building-text">
+      <label>Open - Close</label>
+      <div class="building-text building-first">
         <label><input type="radio" name="brd-opened" value="open" checked="checked">open</label>
         <label><input type="radio" name="brd-opened" value="close">close</label>
       </div>
     </li>
-    <li id="form-password"><input type="password" name="brd-password" placeholder="password" class="building-text"></li>
-    <li id="form-title"><input type="text" name="brd-title" placeholder="title" class="building-text"></li>
-    <li id="form-explain"><textarea form="building-room-form" name="brd-explain" placeholder="Explain about your board" class="building-text"></textarea></li>
+    <li id="form-password"><label for="brd-password">Password</label><br><input type="password" name="brd-password" placeholder="password" class="building-text"></li>
+    <li id="form-title"><label for="brd_Title">Title</label><br><input type="text" name="brd-title" placeholder="title" class="building-text"></li>
+    <li id="form-explain"><label for="brd-explain">Describe</label><br><textarea form="building-room-form" name="brd-explain" placeholder="Explain about your board" class="building-text"></textarea></li>
     <li id="form-submit"><input type="submit" value="or use 'Enter'"></li>
   </form>
 </div>

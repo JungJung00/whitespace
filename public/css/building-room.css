@@ -1,8 +1,20 @@
-.building-room-wrapper li{
+.building-room-wrapper{
+  height: 530px;
+  background-color: #FAFAFA;
+  box-shadow: 2px 2px 4px gray;
   text-align: center;
 }
+.building-room-wrapper li{
+  margin: 5px 0 15px 0;
+}
+.building-room-wrapper li>label{
+  text-align: left;
+}
+.building-first{
+  margin: auto !important;
+}
 .building-text{
-  width: 100%;
+  width: 90%;
   padding: 12px 0 12px 10px;
   margin: 3px 0;
 
@@ -18,15 +30,10 @@
   font-size: 14px;
 }
 .building-text:focus{
-  border: 2px solid #555;
+  border: 2px solid #FF4040;
 }
 #form-opened{
   border-top: none;
-}
-#form-opened>div{
-  float: left;
-  width: 100%;
-  box-sizing: border-box;
 }
 textarea {
   height: 150px;
