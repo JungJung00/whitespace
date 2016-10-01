@@ -1,5 +1,21 @@
 <div class="building-room-wrapper">
-  <form id="building-room-form" class="" action="" method="post">
+  <script type="text/javascript">
+    $(document).ready(function(){
+      $('#form-submit').click(function(event){
+        event.preventDefault();
+        $.ajax({
+          url: '/outside/building-room',
+          type: 'post',
+          data: $('#building-room-form').serialize(),
+          dataType: 'json',
+          success: function(data){
+            console.log(data);
+          }
+        });
+      });
+    });
+  </script>
+  <form id="building-room-form" class="" action="/outside/building-room" method="post">
     <li id="form-opened">
       <label>Open - Close</label>
       <div class="building-text building-first">

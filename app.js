@@ -4,20 +4,21 @@
 var express = require('express');
 var app = express();
 var handlebars = require('express-handlebars').create({defaultLayout:'main'});
+var cookieParser = require('cookie-parser');
+var session = require('express-session');
 var mysql = require('mysql');
 // 커넥션 풀 생성 : 필요할 때마다 연결
-var pool = mysql.createPool({
+var dbOption = {
   host: 'localhost',
   user: 'root',
   port: 3306,
   password: 'ehehgks!!123',
   database: 'whitespace',
   connectionLimit: 10
-});
+}
+var pool = mysql.createPool(dbOption);
 // 게시판 목록 저장
 var _boards = '';
-// 비동기 순서 체크용
-var test = 0;
 
 /****페이징****/
 
@@ -43,7 +44,13 @@ var page = 5;
 
 // static 미들웨어, 정적 자원 디렉토리 지정
 app.use(express.static(__dirname + '/public'))
-   .use(require('body-parser').urlencoded({extended: true}));
+   .use(require('body-parser').urlencoded({extended: true}))
+   .use(cookieParser('temporary@@'))
+   .use(session({
+     secret: 'temporary@@',
+     resave: false,
+     saveUninitialized: true
+   }))
 
 // 뷰 엔진 핸들바 설정
 app.engine('handlebars', handlebars.engine)
@@ -170,8 +177,9 @@ app.post('/outside/moving', function(req, res){
     connection.release();
   });
   console.log(req.body);
-  if(check) res.redirect('/outside/returning');
-  else res.redirect('/outside/moving');
+  // filter에서 유효성 검사를 진행하고, 유효한 값이 아닐 경우 값 전송 자체가
+  // 막히기 때문에 요청이 들어오는 경우는 무조건 redirect하면 된다.
+  res.redirect('/outside/returning');
 });
 
 app.get('/', function(req, res){
@@ -272,9 +280,26 @@ app.post('/Post', function(req, res){
   });
 });
 
-app.post('/outside/building-room', function(req, res){
-
-})
+// app.post('/outside/building-room', function(req, res){
+//   pool.getConnection(function(err, connection){
+//     if (err) throw err;
+//     else{
+//       connection.query('SELECT mbr_Nick, mbr_Chance FROM member WHERE mbr_Nick = ?', 세션 구현하면 그 값으로 채우기, function(err, rows){
+//         if (err) throw err;
+//         else{
+//           if(!rows[0].mbr_Chance){
+//             connection.query('INSERT INTO board VALUES (?, default, ?, ?, default, ?)', [게시판 이름, 게시판 비밀번호, 게시판 성향, 게시판 작성자], function(err, rows){});
+//           }
+//           else{
+//             console.log('You\'ve made board before');
+//           }
+//         }
+//         connection.release();
+//         res.redirect('/');
+//       });
+//     }
+//   });
+// });
 
 /***************************************/
 

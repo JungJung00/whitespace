@@ -1,44 +1,40 @@
-// TODO css 변경 대신 틀림 클래스 만들어서 css 설정 해놓고 클래스를 추가하는 식으로 하는 게 좋을 듯
-// => 후에 submit 할 때 틀림 클래스가 있는 지 체크해서 있으면 블락. 없으면 submit 하는 식으로/
-
-
+var check;
 // ID 유효성 검사
 function idFilter(){
-  var check = false;
   // 값이 입력되었는가
   if($('#input-id').val() == ""){
     $('#input-id + span').text('Input value')
                          .fadeIn({duration: 1000, queue: false});
     $('#input-id').css('border-color', '#FF4040');
-    return check;
+    return check = false;
   }
   // 한글이 포함되었는가
   else if($('#input-id').val().match(/[ㄱ-ㅎㅏ-ㅣ가-힣]/)){
     $('#input-id + span').text('Input only English or \'_\'')
                          .fadeIn({duration: 1000, queue: false});
     $('#input-id').css('border-color', '#FF4040');
-    return check;
+    return check = false;
   }
   // 특수문자가 포함되었는가
   else if($('#input-id').val().match(/[\{\}\[\]\/?.,;:|\)*~`!^\-+<>@\#$%&\\\=\(\'\"]/)){
     $('#input-id + span').text('Don\'t input special letters except for \'_\'')
                          .fadeIn({duration: 1000, queue: false});
     $('#input-id').css('border-color', '#FF4040');
-    return check;
+    return check = false;
   }
   // 공백이 포함되었는가
   else if($('#input-id').val().match(/\s/)){
     $('#input-id + span').text('Don\'t input white space')
                          .fadeIn({duration: 1000, queue: false});
     $('#input-id').css('border-color', '#FF4040');
-    return check;
+    return check = false;
   }
   // 6 ~ 20자인가
   else if(($('#input-id').val().length < 6) || ($('#input-id').val().length > 20)){
     $('#input-id + span').text('Input value between 6 and 20 characters long')
                          .fadeIn({duration: 1000, queue: false});
     $('#input-id').css('border-color', '#FF4040');
-    return check;
+    return check = false;
   }
   // 중복 검사
   $.ajax({
@@ -57,6 +53,7 @@ function idFilter(){
         $('#input-id + span').text('Already using ID. Try others')
                              .fadeIn({duration: 1000, queue: false});
         $('#input-id').css('border-color', '#FF4040');
+        check = false;
       }
     }
   });
@@ -64,7 +61,6 @@ function idFilter(){
 }
 // PASSWORD 유효성 검사
 function pwdFilter(){
-  var check = false;
     // 값이 입력됐는가
     if($('#input-pwd').val() == ""){
       $('#input-pwd + span').text('Input value')
@@ -74,7 +70,7 @@ function pwdFilter(){
         $('#input-pwdck').val('');
         $('#pwdck-slider').slideUp({duration: 800, queue: false});
       }
-      return check;
+      return check = false;
     }
     // 대소문자, 숫자를 섞었는가
     else if(!($('#input-pwd').val().match(/[a-z]/) && $('#input-pwd').val().match(/[A-Z]/) && $('#input-pwd').val().match(/[0-9]/))){
@@ -85,7 +81,7 @@ function pwdFilter(){
         $('#input-pwdck').val('');
         $('#pwdck-slider').slideUp({duration: 800, queue: false});
       }
-      return check;
+      return check = false;
     }
     // 한글이 포함되었는가
     else if($('#input-pwd').val().match(/[ㄱ-ㅎㅏ-ㅣ가-힣]/)){
@@ -96,7 +92,7 @@ function pwdFilter(){
         $('#input-pwdck').val('');
         $('#pwdck-slider').slideUp({duration: 800, queue: false});
       }
-      return check;
+      return check = false;
     }
     // 특수문자가 포함되었는가
     else if(!$('#input-pwd').val().match(/[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"]/)){
@@ -107,7 +103,7 @@ function pwdFilter(){
         $('#input-pwdck').val('');
         $('#pwdck-slider').slideUp({duration: 800, queue: false});
       }
-      return check;
+      return check = false;
     }
     // 공백이 포함되었는가
     else if($('#input-pwd').val().match(/\s/)){
@@ -118,7 +114,7 @@ function pwdFilter(){
         $('#input-pwdck').val('');
         $('#pwdck-slider').slideUp({duration: 800, queue: false});
       }
-      return check;
+      return check = false;
     }
     // 6 ~ 20자인가
     else if(($('#input-pwd').val().length < 6) || ($('#input-pwd').val().length > 20)){
@@ -129,34 +125,30 @@ function pwdFilter(){
         $('#input-pwdck').val('');
         $('#pwdck-slider').slideUp({duration: 800, queue: false});
       }
-      return check;
+      return check = false;
     }
     else{
       $('#input-pwd + span').text('Accepted').fadeOut(2000);
       $('#input-pwd').css('border-color', '#19FF5E');
-      check = true;
       $('#pwdck-slider').slideDown({duration: 800, queue: false});
-      return check;
+      return check = true;
     }
 }
 // PASSWORD CHECK 유효성 검사
 function pwdckFilter(){
-  var check = false;
-
   // pwd와 값이 다를 때
   if($('#input-pwd').val() != $('#input-pwdck').val()){
     $('#input-pwdck + span').text('It is different to above!')
                          .fadeIn({duration: 1000, queue: false});
     $('#input-pwd').css('border-color', '#FF4040');
     $('#input-pwdck').css('border-color', '#FF4040');
-    return check;
+    return check = false;
   }
   else{
     $('#input-pwdck + span').text('Accepted').fadeOut(4000);
     $('#input-pwd').css('border-color', '#19FF5E');
     $('#input-pwdck').css('border-color', '#19FF5E');
-    check = true;
-    return check;
+    return check = true;
   }
 }
 // NICKNAME 유효성 검사
@@ -175,7 +167,7 @@ function nickFilter(){
     $('#input-nick + span').text('Input value')
                          .fadeIn({duration: 1000, queue: false});
     $('#input-nick').css('border-color', '#FF4040');
-    return check;
+    return check = false;
   }
   // 4 ~ 30 바이트 외
   // 한글 10자, 영어 30자
@@ -183,7 +175,7 @@ function nickFilter(){
     $('#input-nick + span').text('Input value between 4 and 30 Bytes long')
                          .fadeIn({duration: 1000, queue: false});
     $('#input-nick').css('border-color', '#FF4040');
-    return check;
+    return check = false;
   }
   // 중복 검사
   $.ajax({
@@ -201,6 +193,7 @@ function nickFilter(){
         $('#input-nick + span').text('Already using Nick. Try others')
                              .fadeIn({duration: 1000, queue: false});
         $('#input-nick').css('border-color', '#FF4040');
+        check = false;
       }
     }
   });
@@ -215,7 +208,7 @@ function emailFilter(){
     $('#input-email + span').text('Input valid email')
                          .fadeIn({duration: 1000, queue: false});
     $('#input-email').css('border-color', '#FF4040');
-    return check;
+    return check = false;
   }
   // 중복검사
   $.ajax({
@@ -233,6 +226,7 @@ function emailFilter(){
         $('#input-email + span').text('Already using E-mail. Try others')
                              .fadeIn({duration: 1000, queue: false});
         $('#input-email').css('border-color', '#FF4040');
+        check = false;
       }
     }
   });
