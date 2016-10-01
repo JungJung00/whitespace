@@ -113,13 +113,55 @@ app.post('/outside/returning', function(req, res) {
 app.get('/outside/moving', function(req, res){
   res.render('moving', {layout: 'none'});
 });
+// 입력 데이터 유효성 검사
+app.post('/filter/id', function(req, res){
+  pool.getConnection(function(err, connection){
+    if (err) throw err;
+    else{
+      connection.query('SELECT mbr_Id FROM member where mbr_Id = ?', req.body.input_Id, function(err, rows){
+        if (err) throw err;
+        else{
+          res.json({isThere: rows.length});
+        }
+        connection.release();
+      });
+    }
+  });
+});
+app.post('/filter/nick', function(req, res){
+  pool.getConnection(function(err, connection){
+    if (err) throw err;
+    else{
+      connection.query('select mbr_Nick from member where mbr_Nick = ?', req.body.input_Nick, function(err, rows){
+        if (err) throw err;
+        else{
+          res.json({isThere: rows.length});
+        }
+        connection.release();
+      });
+    }
+  });
+});
+app.post('/filter/email', function(req, res){
+  pool.getConnection(function(err, connection){
+    if(err) throw err;
+    else{
+      connection.query('select mbr_Email from member where mbr_Email = ?', req.body.input_Email, function(err, rows){
+        if(err) throw err;
+        else{
+          res.json({isThere: rows.length});
+        }
+        connection.release();
+      });
+    }
+  });
+});
+// 입력 데이터 저장
 app.post('/outside/moving', function(req, res){
   var filter = require('./public/js/datafilter.js');
-  var check = false;
   pool.getConnection(function(err, connection){
-    check = filter.dataFilter(req.body, connection);
     if(err) throw err;
-    else if(check){
+    else{
       bd = req.body;
       dbSet = {mbr_Id: req.body.id, mbr_Pwd: req.body.pwd, mbr_Nick: req.body.nick, mbr_EMail: req.body.email};
       connection.query("INSERT INTO member SET ?", dbSet,

@@ -1,18 +1,33 @@
+
 #burden-wrapper{
   max-width: 600px;
   margin: auto;
-  margin-top: 115px;
+  margin-top: 55px;
 }
 #burden-wrapper span{
   text-align: center;
 }
 /***************form***************/
-input:first-child{
-  margin-top: 0px;
-}
 .form-moving{
   width: 100%;
-  margin-top: 30px;
+  /* to use tooltip*/
+  position: relative;
+}
+#pwdck-slider{
+  display: none;
+}
+.tip-text{
+  display: none;
+  width: 60%;
+  right: 3px;
+  top: 20px;
+  background-color: rgba(0,0,0,0);
+  color: #FF4040;
+  text-align: center;
+  font-size: 0.9em;
+
+  position: absolute;
+  z-index: 1;
 }
 
 /**********************************/
