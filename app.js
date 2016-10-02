@@ -11,6 +11,8 @@ var MySQLStore = require('express-mysql-session')(session);
 var mysql = require('mysql');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+var hasher = require('pbkdf2-password')();
+
 // 커넥션 풀 생성 : 필요할 때마다 연결
 var dbOption = {
   host: 'localhost',
@@ -91,30 +93,32 @@ passport.use(new LocalStrategy(
           connection.query('select * from member where mbr_Id = ?', username, function(err, rows){
             if(err){
               console.log('Query Error: ' + err);
-              done(null, false);
+              return done(null, false);
             }
             else{
               // 아이디 불일치
               if(!rows.length){
                 console.log('\n\nThere is no ID that you typed');
-                done(null, false);
+                return done(null, false);
               }
               else{
-                // 아이디, 비밀번호 일치
-                if(password == rows[0].mbr_Pwd){
-                  // 회원 정보를 serializeUser(callback)에 보낸다.
-                  done(null, rows[0])
-                }
-                // 비밀번호 불일치
-                else{
-                  console.log('\n\nWrong password');
-                  done(null, false);
-                }
+                return hasher({password: password, salt: rows[0].mbr_Salt}, function(err, pass, salt, hash){
+                  // 아이디, 비밀번호 일치
+                  if(hash == rows[0].mbr_Pwd){
+                    // 회원 정보를 serializeUser(callback)에 보낸다.
+                    done(null, rows[0]);
+                  }
+                  // 비밀번호 불일치
+                  else{
+                    console.log('\n\nWrong password');
+                    done(null, false);
+                  }
+                });
               }
             }
           });
-          connection.release();
         }
+        connection.release();
       });
       // done(null, false);
   }
@@ -135,7 +139,7 @@ app.get('/outside/returning', function(req, res){
   // 이미 세션이 등록되어 있어 req에 user 객체가 있는 경우 home으로 이동한다.
   if(req.user){
     console.log('there is a session');
-    res.redirect('/');
+      res.redirect('/');
   }
   // 없다면 로그인 페이지 렌더링
   else{
@@ -197,20 +201,22 @@ app.post('/filter/email', function(req, res){
 // 입력 데이터 저장
 app.post('/outside/moving', function(req, res){
   var filter = require('./public/js/datafilter.js');
-  pool.getConnection(function(err, connection){
-    if(err) throw err;
-    else{
-      bd = req.body;
-      dbSet = {mbr_Id: req.body.id, mbr_Pwd: req.body.pwd, mbr_Nick: req.body.nick, mbr_EMail: req.body.email};
-      connection.query("INSERT INTO member SET ?", dbSet,
-      function(err, rows){if(err) console.log('Query Error: ' + err); else console.log('Query Success');});
-    }
-    connection.release();
+  var dbSet;
+  hasher({password: req.body.pwd}, function(err, pass, salt, hash){
+    dbSet = {mbr_Id: req.body.id, mbr_Pwd: hash, mbr_Salt: salt, mbr_Nick: req.body.nick, mbr_EMail: req.body.email};
+    console.log(dbSet);
+    pool.getConnection(function(err, connection){
+      if(err) throw err;
+      else{
+        connection.query("INSERT INTO member SET ?", dbSet,
+        function(err, rows){if(err) console.log('Query Error: ' + err); else console.log('Query Success');});
+      }
+      connection.release();
+    });
   });
-  console.log(req.body);
   // filter에서 유효성 검사를 진행하고, 유효한 값이 아닐 경우 값 전송 자체가
   // 막히기 때문에 요청이 들어오는 경우는 무조건 redirect하면 된다.
-  res.redirect('/outside/returning');
+    res.redirect('/outside/returning');
 });
 
 app.get('/', function(req, res){
@@ -308,6 +314,10 @@ app.post('/Post', function(req, res){
       });
     }
   });
+});
+app.get('/outside', function(req, res){
+  req.logout();
+  res.redirect('/outside/returning');
 });
 
 // app.post('/outside/building-room', function(req, res){

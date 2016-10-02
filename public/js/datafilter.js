@@ -118,8 +118,8 @@ function pwdFilter(){
       return check = false;
     }
     // 6 ~ 20자인가
-    else if(($('#input-pwd').val().length < 6) || ($('#input-pwd').val().length > 20)){
-      $('#input-pwd + span').text('Input value between 6 and 20 characters long')
+    else if(($('#input-pwd').val().length < 6) || ($('#input-pwd').val().length > 40)){
+      $('#input-pwd + span').text('Input value between 6 and 40 characters long')
                             .fadeIn({duration: 1000, queue: false});
       $('#input-pwd').css('border-color', '#FF4040');
       if($('#pwdck-slider').css('display') == 'block'){
