@@ -67,11 +67,6 @@ app.engine('handlebars', handlebars.engine)
 // res.writeHead 대용
 app.set('port', process.env.PORT || 3001);
 
-// 데이터베이스 연결 방법
-  // pool.getConnection(function(err, cnct){
-  //   내용
-  // })
-
 /****************************************/
 
 
@@ -130,62 +125,28 @@ passport.serializeUser(function(user, done){
   console.log('serialize');
   done(null, user);
 });
-// 세션이 이미 저장되어 있을 경우
+// 세션이 이미 저장되어 있을 경우 req에 user 객체를 추가한다.
 passport.deserializeUser(function(user, done){
   // req의 객체 user에 저장. user객체는 passport가 새로 추가하는 객체.
   console.log('deserialize');
   done(null, user);
 });
 app.get('/outside/returning', function(req, res){
+  // 이미 세션이 등록되어 있어 req에 user 객체가 있는 경우 home으로 이동한다.
   if(req.user){
     console.log('there is a session');
     res.redirect('/');
   }
+  // 없다면 로그인 페이지 렌더링
   else{
     res.render('returning', {layout: 'none-returning'});
   }
 });
+// 로그인 인증 과정을 passport에 위탁
 app.post('/outside/returning', passport.authenticate('local', {successRedirect: '/',
                                                                failureRedirect: '/outside/returning',
                                                                failureFlash: false})
 );
-// app.post('/outside/returning', function(req, res) {
-//   pool.getConnection(function(err, connection){
-//     if(err) throw err;
-//     else{
-//       // TODO 입력 틀렸을 경우 페이지 만들기
-//       // 로그인 처리
-//       connection.query('select * from member where mbr_Id = ?', req.body.username, function(err, rows){
-//         if(err){
-//           console.log('Query Error: ' + err);
-//           redirect('/outside/returning');
-//         }
-//         else{
-//           // 아이디 불일치
-//           if(!rows.length){
-//             console.log('\n\nThere is no ID that you typed');
-//             res.redirect('/outside/returning');
-//           }
-//           else{
-//             // 아이디, 비밀번호 일치
-//             if(req.body.password == rows[0].mbr_Pwd){
-//               // 로그인 성공 시 세션 생성
-//               req.session.Nick = rows[0].mbr_Nick;
-//               console.log('\n\nWelcome ' + req.session.Nick + '!');
-//               res.redirect('/');
-//             }
-//             // 비밀번호 불일치
-//             else{
-//               console.log('\n\nWrong password!');
-//               res.redirect('/outside/returning');
-//             }
-//           }
-//         }
-//       });
-//       connection.release();
-//     }
-//   });
-// });
 
 app.get('/outside/moving', function(req, res){
   res.render('moving', {layout: 'none-moving'});
@@ -261,7 +222,6 @@ app.get('/', function(req, res){
        for(var i in rows){
          _boards += '<li><a href="/front-door/"' + rows[i].brd_Title + ' class="room-list inactive-board">' + rows[i].brd_Title + '</a></li>';
        }console.log('Get boards menu');
-      // x  console.log(_boards);
        // getConnection 함수 밖에 렌더 함수를 쓰면 비동기 방식이기 때문에 게시판 항목을 모두 읽어오기 전 렌더링을 해버린다.
        res.render('front-door', {boards: _boards});
      });
