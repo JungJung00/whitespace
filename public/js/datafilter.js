@@ -1,40 +1,41 @@
-var check;
+// TODO success 호출 뒤 값을 return하는 방법을 알 수가 없어 일단 async:false로 동기식으로 진행함...ㅠㅜㅠㅜㅜㅠㅜㅍ러ㅜㅊ타퍼ㅜ푸탚ㄴㅍㅌㅋㅋㅋㅌㅋㅋㅋㅋㅌㅋㅋㅋㅋ
 // ID 유효성 검사
 function idFilter(){
+  var check = false;
   // 값이 입력되었는가
   if($('#input-id').val() == ""){
     $('#input-id + span').text('Input value')
                          .fadeIn({duration: 1000, queue: false});
     $('#input-id').css('border-color', '#FF4040');
-    return check = false;
+    return check;
   }
   // 한글이 포함되었는가
   else if($('#input-id').val().match(/[ㄱ-ㅎㅏ-ㅣ가-힣]/)){
     $('#input-id + span').text('Input only English or \'_\'')
                          .fadeIn({duration: 1000, queue: false});
     $('#input-id').css('border-color', '#FF4040');
-    return check = false;
+    return check;
   }
   // 특수문자가 포함되었는가
   else if($('#input-id').val().match(/[\{\}\[\]\/?.,;:|\)*~`!^\-+<>@\#$%&\\\=\(\'\"]/)){
     $('#input-id + span').text('Don\'t input special letters except for \'_\'')
                          .fadeIn({duration: 1000, queue: false});
     $('#input-id').css('border-color', '#FF4040');
-    return check = false;
+    return check;
   }
   // 공백이 포함되었는가
   else if($('#input-id').val().match(/\s/)){
     $('#input-id + span').text('Don\'t input white space')
                          .fadeIn({duration: 1000, queue: false});
     $('#input-id').css('border-color', '#FF4040');
-    return check = false;
+    return check;
   }
   // 6 ~ 20자인가
   else if(($('#input-id').val().length < 6) || ($('#input-id').val().length > 20)){
     $('#input-id + span').text('Input value between 6 and 20 characters long')
                          .fadeIn({duration: 1000, queue: false});
     $('#input-id').css('border-color', '#FF4040');
-    return check = false;
+    return check;
   }
   // 중복 검사
   $.ajax({
@@ -42,6 +43,7 @@ function idFilter(){
     type: 'post',
     data: {input_Id: $('#input-id').val()},
     dataType: 'json',
+    async: false,
     success: function(data){
       if(!data.isThere){
         $('#input-id + span').text('Accepted').fadeOut(4000);
@@ -53,7 +55,6 @@ function idFilter(){
         $('#input-id + span').text('Already using ID. Try others')
                              .fadeIn({duration: 1000, queue: false});
         $('#input-id').css('border-color', '#FF4040');
-        check = false;
       }
     }
   });
@@ -167,7 +168,7 @@ function nickFilter(){
     $('#input-nick + span').text('Input value')
                          .fadeIn({duration: 1000, queue: false});
     $('#input-nick').css('border-color', '#FF4040');
-    return check = false;
+    return check;
   }
   // 4 ~ 30 바이트 외
   // 한글 10자, 영어 30자
@@ -175,7 +176,7 @@ function nickFilter(){
     $('#input-nick + span').text('Input value between 4 and 30 Bytes long')
                          .fadeIn({duration: 1000, queue: false});
     $('#input-nick').css('border-color', '#FF4040');
-    return check = false;
+    return check;
   }
   // 중복 검사
   $.ajax({
@@ -183,6 +184,7 @@ function nickFilter(){
     type: 'post',
     data: {input_Nick: $('#input-nick').val()},
     dataType: 'json',
+    async: false,
     success: function(data){
       if(!data.isThere){
         $('#input-nick + span').text('Accepted').fadeOut(4000);
@@ -193,7 +195,6 @@ function nickFilter(){
         $('#input-nick + span').text('Already using Nick. Try others')
                              .fadeIn({duration: 1000, queue: false});
         $('#input-nick').css('border-color', '#FF4040');
-        check = false;
       }
     }
   });
@@ -204,11 +205,11 @@ function nickFilter(){
 // 이메일 유효성 검사
 function emailFilter(){
   var check = false;
-  if(!$('#input-email').val().match(/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/)){
+  if(!$('#input-email').val().match(/^([a-zA-Z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/)){
     $('#input-email + span').text('Input valid email')
                          .fadeIn({duration: 1000, queue: false});
     $('#input-email').css('border-color', '#FF4040');
-    return check = false;
+    return check;
   }
   // 중복검사
   $.ajax({
@@ -216,6 +217,7 @@ function emailFilter(){
     type: 'post',
     data: {input_Email: $('#input-email').val()},
     dataType: 'json',
+    async: false,
     success: function(data){
       if(!data.isThere){
         $('#input-email + span').text('Accepted').fadeOut(4000);
@@ -226,7 +228,6 @@ function emailFilter(){
         $('#input-email + span').text('Already using E-mail. Try others')
                              .fadeIn({duration: 1000, queue: false});
         $('#input-email').css('border-color', '#FF4040');
-        check = false;
       }
     }
   });
