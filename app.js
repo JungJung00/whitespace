@@ -4,9 +4,13 @@
 var express = require('express');
 var app = express();
 var handlebars = require('express-handlebars').create({defaultLayout:'main'});
+var credentials = require('./credentials.js')
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
+var MySQLStore = require('express-mysql-session')(session);
 var mysql = require('mysql');
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
 // 커넥션 풀 생성 : 필요할 때마다 연결
 var dbOption = {
   host: 'localhost',
@@ -45,12 +49,15 @@ var page = 5;
 // static 미들웨어, 정적 자원 디렉토리 지정
 app.use(express.static(__dirname + '/public'))
    .use(require('body-parser').urlencoded({extended: true}))
-   .use(cookieParser('temporary@@'))
+   .use(cookieParser(credentials.cookieSecret))
    .use(session({
-     secret: 'temporary@@',
+     secret: credentials.cookieSecret,
      resave: false,
-     saveUninitialized: true
+     saveUninitialized: false,
+     store: new MySQLStore(dbOption)
    }))
+   .use(passport.initialize())
+   .use(passport.session())
 
 // 뷰 엔진 핸들바 설정
 app.engine('handlebars', handlebars.engine)
@@ -76,48 +83,109 @@ app.get('/test', function(req, res){
 });
 app.post('/test', function(req, res){
   console.log(req.body.test);
-  res.redirect('/test');
 });
 
-app.get('/outside/returning', function(req, res){
- res.render('returning', {layout: 'none-returning'});
-})
-app.post('/outside/returning', function(req, res) {
-  pool.getConnection(function(err, connection){
-    if(err) throw err;
-    else{
-      // TODO 입력 틀렸을 경우 페이지 만들기
-      // 로그인 처리
-      connection.query('select * from member where mbr_Id = ?', req.body.id, function(err, rows){
-        if(err){
-          console.log('Query Error: ' + err);
-          redirect('/outside/returning');
-        }
+// 자체 회원 인증
+passport.use(new LocalStrategy(
+  function(username, password, done){
+    pool.getConnection(function(err, connection){
+        if(err) throw err;
         else{
-          // 아이디 불일치
-          if(rows.length == 0){
-
-            console.log('\n\nThere is no ID that you typed');
-            res.redirect('/outside/returning');
-          }
-          else{
-            // 아이디, 비밀번호 일치
-            if(req.body.pwd == rows[0].mbr_Pwd){
-              console.log('\n\nWelcome ' + rows[0].mbr_Nick + '!');
-              res.redirect('/');
+          // TODO 입력 틀렸을 경우 페이지 만들기
+          // 로그인 처리
+          connection.query('select * from member where mbr_Id = ?', username, function(err, rows){
+            if(err){
+              console.log('Query Error: ' + err);
+              done(null, false);
             }
-            // 비밀번호 불일치
             else{
-              console.log('\n\nWrong password!');
-              res.redirect('/outside/returning');
+              // 아이디 불일치
+              if(!rows.length){
+                console.log('\n\nThere is no ID that you typed');
+                done(null, false);
+              }
+              else{
+                // 아이디, 비밀번호 일치
+                if(password == rows[0].mbr_Pwd){
+                  // 회원 정보를 serializeUser(callback)에 보낸다.
+                  done(null, rows[0])
+                }
+                // 비밀번호 불일치
+                else{
+                  console.log('\n\nWrong password');
+                  done(null, false);
+                }
+              }
             }
-          }
+          });
+          connection.release();
         }
       });
-      connection.release();
-    }
-  });
+      // done(null, false);
+  }
+));
+// done이 false가 아닐 경우 실행
+// 사용자의 세션(닉네임)을 저장한다.
+passport.serializeUser(function(user, done){
+  console.log('serialize');
+  done(null, user);
 });
+// 세션이 이미 저장되어 있을 경우
+passport.deserializeUser(function(user, done){
+  // req의 객체 user에 저장. user객체는 passport가 새로 추가하는 객체.
+  console.log('deserialize');
+  done(null, user);
+});
+app.get('/outside/returning', function(req, res){
+  if(req.user){
+    console.log('there is a session');
+    res.redirect('/');
+  }
+  else{
+    res.render('returning', {layout: 'none-returning'});
+  }
+});
+app.post('/outside/returning', passport.authenticate('local', {successRedirect: '/',
+                                                               failureRedirect: '/outside/returning',
+                                                               failureFlash: false})
+);
+// app.post('/outside/returning', function(req, res) {
+//   pool.getConnection(function(err, connection){
+//     if(err) throw err;
+//     else{
+//       // TODO 입력 틀렸을 경우 페이지 만들기
+//       // 로그인 처리
+//       connection.query('select * from member where mbr_Id = ?', req.body.username, function(err, rows){
+//         if(err){
+//           console.log('Query Error: ' + err);
+//           redirect('/outside/returning');
+//         }
+//         else{
+//           // 아이디 불일치
+//           if(!rows.length){
+//             console.log('\n\nThere is no ID that you typed');
+//             res.redirect('/outside/returning');
+//           }
+//           else{
+//             // 아이디, 비밀번호 일치
+//             if(req.body.password == rows[0].mbr_Pwd){
+//               // 로그인 성공 시 세션 생성
+//               req.session.Nick = rows[0].mbr_Nick;
+//               console.log('\n\nWelcome ' + req.session.Nick + '!');
+//               res.redirect('/');
+//             }
+//             // 비밀번호 불일치
+//             else{
+//               console.log('\n\nWrong password!');
+//               res.redirect('/outside/returning');
+//             }
+//           }
+//         }
+//       });
+//       connection.release();
+//     }
+//   });
+// });
 
 app.get('/outside/moving', function(req, res){
   res.render('moving', {layout: 'none-moving'});
