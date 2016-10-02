@@ -17,17 +17,9 @@
   display: none;
 }
 .tip-text{
-  display: none;
   width: 60%;
   right: 3px;
   top: 20px;
-  background-color: rgba(0,0,0,0);
-  color: #FF4040;
-  text-align: center;
-  font-size: 0.9em;
-
-  position: absolute;
-  z-index: 1;
 }
 
 /**********************************/

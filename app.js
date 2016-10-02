@@ -80,12 +80,13 @@ app.post('/test', function(req, res){
 });
 
 app.get('/outside/returning', function(req, res){
- res.render('returning', {layout: 'none'});
+ res.render('returning', {layout: 'none-returning'});
 })
 app.post('/outside/returning', function(req, res) {
   pool.getConnection(function(err, connection){
     if(err) throw err;
     else{
+      // TODO 입력 틀렸을 경우 페이지 만들기
       // 로그인 처리
       connection.query('select * from member where mbr_Id = ?', req.body.id, function(err, rows){
         if(err){
@@ -95,6 +96,7 @@ app.post('/outside/returning', function(req, res) {
         else{
           // 아이디 불일치
           if(rows.length == 0){
+
             console.log('\n\nThere is no ID that you typed');
             res.redirect('/outside/returning');
           }
@@ -118,7 +120,7 @@ app.post('/outside/returning', function(req, res) {
 });
 
 app.get('/outside/moving', function(req, res){
-  res.render('moving', {layout: 'none'});
+  res.render('moving', {layout: 'none-moving'});
 });
 // 입력 데이터 유효성 검사
 app.post('/filter/id', function(req, res){

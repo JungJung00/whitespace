@@ -1,9 +1,64 @@
+<div id="warning">
+  <h1 class="tip-text"></h1>
+</div>
 <div id="login-wrapper">
   <form id="form-returning" action="/outside/returning" method="post" name="submitter">
-    <input type="text" name="id" placeholder="ID" class="form-input form-returning" id="login-id">
-    <input type="text" name="pwd" placeholder="Password" class="form-input form-returning" id="login-pwd">
+    <ul>
+      <li class="form-returning"><input type="text" name="id" placeholder="ID" class="form-input" id="login-id"></li>
+      <li class="form-returning"><input type="password" name="pwd" placeholder="Password" class="form-input" id="login-pwd"></li>
+    </ul>
   </form>
   <span><h3>Press <span class="enter">enter</span> to finish returning</h3></span>
   <span><h5>We wish you to <a href="/outside/moving">be our neighbor</a></h5></span>
 </div>
+<script type="text/javascript">
+  $(document).ready(function(){
+    var checkId;
+    var checkPwd
+    $('#login-id').focus();
+    $('#login-id').on('textchange', function(){
+      if($('#login-id').val().length < 6 || $('#login-id').val().length > 20){
+        $('#warning h1').text('Input 6 ~ 20').fadeIn({duration:1000, queue: false});
+        $('#login-id').css('border-color', '#FF4040');
+        checkId = false;
+      }
+      else{
+        $('#warning h1').text('Accepted').fadeIn({duration:1000, queue: false}).fadeOut({duration:1000, queue: false});
+        $('#login-id').css('border-color', '#19FF5E');
+        checkId = true;
+      }
+    }).on('keydown', function(event){
+      switch(event.keyCode){
+        case 13:
+          $('#login-pwd').focus();
+      }
+    });
+
+    $('#login-pwd').on('textchange', function(){
+      if($('#login-pwd').val().length < 6 || $('#login-pwd').val().length > 20){
+        $('#warning h1').text('Input 6 ~ 20').fadeIn({duration:1000, queue: false});
+        $('#login-pwd').css('border-color', '#FF4040');
+        checkPwd = false;
+      }
+      else{
+        $('#warning h1').text('Accepted').fadeIn({duration:1000, queue: false}).fadeOut({duration:1000, queue: false});
+        $('#login-pwd').css('border-color', '#19FF5E');
+        checkPwd = true;
+      }
+    }).on('keydown', function(event){
+      switch(event.keyCode){
+        case 13:
+          if(checkId && checkPwd)
+            document.submitter.submit();
+          else{
+            if(!checkId)
+              $('#login-id').focus();
+            else if(!checkPwd)
+              $('#login-pwd').focus();
+          }
+      }
+    });
+  });
+</script>
+<script type="text/javascript" src="/js/jquery.splendid.textchange.js"></script>
 <script type="text/javascript" src="/js/submit.js"></script>
