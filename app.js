@@ -120,19 +120,17 @@ passport.use(new LocalStrategy(
         }
         connection.release();
       });
-      // done(null, false);
   }
 ));
 // done이 false가 아닐 경우 실행
 // 사용자의 세션(닉네임)을 저장한다.
 passport.serializeUser(function(user, done){
-  console.log('serialize');
+  console.log('serial user : ' + user.mbr_Nick);
   done(null, user);
 });
 // 세션이 이미 저장되어 있을 경우 req에 user 객체를 추가한다.
 passport.deserializeUser(function(user, done){
   // req의 객체 user에 저장. user객체는 passport가 새로 추가하는 객체.
-  console.log('deserialize');
   done(null, user);
 });
 app.get('/outside/returning', function(req, res){
@@ -315,32 +313,56 @@ app.post('/Post', function(req, res){
     }
   });
 });
+app.post('/view-post', function(req, res){
+  pool.getConnection(function(err, connection){
+    if (err) throw err;
+    else{
+      connection.query('SELECT * FROM post WHERE pst_Id = ?', req.body.cPost, function(err, rows){
+        if(err) throw err;
+        else{
+          if(!rows[0])
+            res.json({pst_Id: 'none', brd_Title: 'none', pst_Writer: 'none', pst_View: 'none', pst_Date: 'none', pst_Title: 'There is no post any more', pst_Content: 'Nothing to show'});
+          else
+            res.json(rows[0]);
+        }
+        connection.release();
+      });
+    }
+  });
+});
+
+app.post('/outside/building-room', function(req, res){
+  pool.getConnection(function(err, connection){
+    if (err) throw err;
+    else{
+      connection.query('SELECT mbr_Nick, mbr_Chance FROM member WHERE mbr_Nick = ?', req.user.mbr_Nick, function(err, rows){
+        if (err) throw err;
+        else{
+          if(!rows[0].mbr_Chance){
+            connection.query('INSERT INTO board VALUES (?, default, ?, ?, default, ?)', [req.body['brd-title'], req.body['brd-password'], req.body['brd-opened'], req.user.mbr_Nick], function(err, rows){});
+          }
+          else{
+            console.log('You\'ve made board before');
+          }
+        }
+        connection.release();
+        res.redirect('/');
+      });
+    }
+  });
+});
+
+// app.get('/outside', function(req, res){
+//   req.logout();
+//   req.session.destroy(function(err){
+//     if (err) throw err;
+//     res.redirect('/outside/returning');
+//   });
+// });
 app.get('/outside', function(req, res){
   req.logout();
   res.redirect('/outside/returning');
 });
-
-// app.post('/outside/building-room', function(req, res){
-//   pool.getConnection(function(err, connection){
-//     if (err) throw err;
-//     else{
-//       connection.query('SELECT mbr_Nick, mbr_Chance FROM member WHERE mbr_Nick = ?', 세션 구현하면 그 값으로 채우기, function(err, rows){
-//         if (err) throw err;
-//         else{
-//           if(!rows[0].mbr_Chance){
-//             connection.query('INSERT INTO board VALUES (?, default, ?, ?, default, ?)', [게시판 이름, 게시판 비밀번호, 게시판 성향, 게시판 작성자], function(err, rows){});
-//           }
-//           else{
-//             console.log('You\'ve made board before');
-//           }
-//         }
-//         connection.release();
-//         res.redirect('/');
-//       });
-//     }
-//   });
-// });
-
 /***************************************/
 
 

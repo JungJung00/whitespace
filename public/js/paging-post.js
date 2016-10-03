@@ -1,6 +1,6 @@
 function pagingP(board, _cPage){
   var template;
-  var prepostList = $('#prepost-template-target')
+  var prepostList = $('#prepost-template-target');
   var prepost = '';
 
   // load external template

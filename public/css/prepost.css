@@ -1,9 +1,8 @@
 /***********content***********/
 .prepost-list-wrapper{
-  width: 700px;
+  width: 70%;
   height: auto;
   margin: auto;
-  margin-top: 30px;
 }
 .prepost-list-wrapper ul{
   padding: 0px;
@@ -13,8 +12,11 @@
 }
 .prepost-list-wrapper ul li{
   /*fix height become always 0px*/
-  overflow: hidden;
+  overflow:hidden;
   border-top: 0px;
+}
+#prepost-template-target{
+  margin-top: 10%;
 }
 .prepost-wrapper{
   margin-bottom: 0px;
@@ -22,16 +24,15 @@
 }
 .prepost{
   height: 52px;
-  overflow: hidden;
 }
 .prepost-title{
-  width: 499px;
+  width: 75%;
   float: left;
 
   background-color: rgba(51,0,46,0.1);
 }
 .prepost-detail{
-  width: 199px;
+  width: 25%;
   float: left;
 
   background-color: rgba(115, 113, 40, 0.1);
@@ -46,7 +47,7 @@
   font-size: 0.8em;
 }
 .page-wrapper{
-  width: 660px;
+  width: 100%;
   height: 22px;
 
   text-align: center;

@@ -41,9 +41,10 @@ a{
   font-weight: bold;
 }
 #devider{
-  height: 80px !important;
-  margin-top: 15px;
-  margin-bottom: 19px !important;
+  margin-bottom: 3px
+}
+#devider a{
+  padding: 15px 0 !important
 }
 #board a.active-board{
   background-color: #A80000;
@@ -62,6 +63,7 @@ a{
   width: 83%;
   height:inherit;
   float:left;
+  overflow-y: scroll;
 }
 
 ul{
