@@ -218,20 +218,25 @@ app.post('/outside/moving', function(req, res){
 });
 
 app.get('/', function(req, res){
- pool.getConnection(function(err, connection){
-   if(err) throw err;
-   else{
-     connection.query('select brd_Title from board', function(err, rows){
-       _boards = '<li><a href="/" class="room-list active-board">front-door</a></li>';
-       for(var i in rows){
-         _boards += '<li><a href="/front-door/"' + rows[i].brd_Title + ' class="room-list inactive-board">' + rows[i].brd_Title + '</a></li>';
-       }console.log('Get boards menu');
-       // getConnection 함수 밖에 렌더 함수를 쓰면 비동기 방식이기 때문에 게시판 항목을 모두 읽어오기 전 렌더링을 해버린다.
-       res.render('front-door', {boards: _boards});
-     });
-   }
-   connection.release();
- });
+  if(!req.user){
+      res.redirect('/outside/returning');
+  }
+  else{
+    pool.getConnection(function(err, connection){
+      if(err) throw err;
+      else{
+        connection.query('select brd_Title from board', function(err, rows){
+          _boards = '<li><a href="/" class="room-list active-board">front-door</a></li>';
+          for(var i in rows){
+            _boards += '<li><a href="/front-door/"' + rows[i].brd_Title + ' class="room-list inactive-board">' + rows[i].brd_Title + '</a></li>';
+          }console.log('Get boards menu');
+          // getConnection 함수 밖에 렌더 함수를 쓰면 비동기 방식이기 때문에 게시판 항목을 모두 읽어오기 전 렌더링을 해버린다.
+          res.render('front-door', {boards: _boards});
+        });
+      }
+      connection.release();
+    });
+  }
 });
 app.post('/Page', function(req, res){
   // TODO 중복 코드 모듈화 가능한지 생각 : 그냥 통짜로 모듈화 했을 땐 rows 등의 변수를 사용 못함
