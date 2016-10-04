@@ -1,7 +1,4 @@
 .building-room-wrapper{
-  height: 530px;
-  background-color: #FAFAFA;
-  box-shadow: 2px 2px 4px gray;
   text-align: center;
 }
 .building-room-wrapper li{

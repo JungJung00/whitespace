@@ -31,7 +31,7 @@ a{
   padding-left: 0px;
 }
 #board a{
-  padding: 12px 16px;
+  padding: 17px 17px;
   display: block;
 
   color: #000;
@@ -41,9 +41,10 @@ a{
   font-weight: bold;
 }
 #devider{
-  height: 80px !important;
-  margin-top: 15px;
-  margin-bottom: 19px !important;
+  margin-bottom: 3px;
+}
+#devider a{
+  padding: 15px 0 !important
 }
 #board a.active-board{
   background-color: #A80000;
@@ -62,8 +63,22 @@ a{
   width: 83%;
   height:inherit;
   float:left;
+  overflow-y: scroll;
 }
-
+#write-post{
+  float: right;
+  margin-top: 3%;
+  background-color: #FF4040;
+  border: none;
+  color: white;
+  padding: 8px 28px;
+  font-size: 1.3em;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+  outline: 2px dashed white;
+  outline-offset: -5px;
+}
 ul{
   list-style: none;
 }

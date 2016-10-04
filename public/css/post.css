@@ -1,0 +1,26 @@
+.post-wrapper{
+  height: 83%;
+  margin: auto;
+  margin-top: 62px;
+}
+.post-wrapper ul li{
+  text-align: center;
+}
+#post-detail{
+  height: auto;
+  overflow: hidden;
+
+  margin-bottom: 7px;
+}
+.idAndBrd{
+  float: left;
+}
+.andSoOn{
+  float: right;
+}
+#post-title{
+}
+#post-content{
+}
+#post-comment{
+}

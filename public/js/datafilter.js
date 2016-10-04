@@ -233,4 +233,37 @@ function emailFilter(){
   });
   return check;
 }
-// connection.query('select mbr_Email from member where mbr_Email = ?', $('#input-email').val(), function(err, rows){
+
+// 인증 코드 이메일 전송
+function verifyEmail(){
+  $('#keyck-slider').slideDown({duration: 800, queue: false});
+  $('#input-keyck').focus();
+  $.ajax({
+    url: '/filter/verify',
+    type: 'post',
+    data: {user: $('#input-email').val()},
+    dataType: 'json',
+    success: function(){
+      $('#input-email + span').text('Key sended to your E-mail. Check and input.')
+                           .fadeIn({duration: 1000, queue: false});
+    }
+  });
+}
+
+function verifyCode(){
+  $.ajax({
+    url: '/filter/code',
+    type: 'post',
+    data: {input_Code: $('#input-keyck').val(), input: $('#form-burden').serialize()},
+    dataType: 'json',
+    success: function(data){
+      if(!data.result){
+        console.log('asd');
+        $('#input-keyck + span').text('Wrong Authenticate Code. We send Code again. Check.');
+                                // .fadeIn({duration: 1000, queue: false})
+                                // .fadeOut({duration: 2000, queue: false});
+        verifyEmail();
+      }
+    }
+  });
+}

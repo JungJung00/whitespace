@@ -1,5 +1,25 @@
-<!-- TODO CSS3 예제들 적용 -->
-<!-- TODO  -->
-<li><div class="">
-
-</div></li>
+<div class="post-wrapper">
+    <div id="post-detail" class="">
+        <div class="idAndBrd">
+          <ul>
+            <li><span class="prepost-small" style="padding-left:1px">#{{this.pst_Id}}</span> <span class="prepost-small" style="padding-right:1px">{{this.brd_Title}}</span></li>
+            <li><span class="prepost-small">{{this.pst_Writer}}</span></li>
+          </ul>
+        </div>
+        <div class="andSoOn">
+          <ul>
+            <li><spanclass="prepost-small">{{this.pst_View}}</span><span style="padding-left: 10px">views</span></li>
+            <li style="width: 100%"><span class="prepost-small">{{this.pst_Date}}</span></li>
+          </ul>
+        </div>
+    </div>
+    <div id="post-title" class="게시글 제목">
+      <li><span><h2 style="margin-top:0; padding-top:15px">{{this.pst_Title}}</h2></span></li>
+    </div>
+    <div id="post-content" class="게시글 내용">
+      <span>{{this.pst_Content}}</span>
+    </div>
+    <div id="post-comment" class="댓글">
+      댓글 만들어
+    </div>
+</div>

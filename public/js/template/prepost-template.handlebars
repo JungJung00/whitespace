@@ -1,8 +1,8 @@
 <li class="prepost-wrapper">
     <div class="prepost prepost-title">
-      <span class="prepost-small">#{{this.pst_Id}} {{this.brd_Title}}</span>
+      <span class="prepost-small">#</span><span class="prepost-small pst-Id">{{this.pst_Id}}</span> <span class="prepost-small">{{this.brd_Title}}</span>
       <br>
-      <a href="#"><span class="prepost-normal">{{this.pst_Title}}</span></a>
+      <a href="#" onClick="viewPost(parseInt($(this).prevAll('.pst-Id').text()))"><span class="prepost-normal">{{this.pst_Title}}</span></a>
     </div>
     <div class="prepost prepost-detail">
       <span class="prepost-small">{{this.pst_Writer}}</span>
