@@ -1,19 +1,18 @@
 // 최초로 실행되는 애플리케이션 = 엔트리
 
 /*****************변수*******************/
+// 기본
 var express = require('express');
 var app = express();
 var handlebars = require('express-handlebars').create({defaultLayout:'main'});
-var credentials = require('./credentials.js')
+// 중요 정보 저장 파일(비밀번호 등)
+var credentials = require('./credentials.js');
+// 세션 관련
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
+// DB 관련
 var MySQLStore = require('express-mysql-session')(session);
 var mysql = require('mysql');
-var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
-var hasher = require('pbkdf2-password')();
-
-// 커넥션 풀 생성 : 필요할 때마다 연결
 var dbOption = {
   host: 'localhost',
   user: 'root',
@@ -23,6 +22,15 @@ var dbOption = {
   connectionLimit: 10
 }
 var pool = mysql.createPool(dbOption);
+// 로그인 인증 관련
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+// 암호화 관련
+var hasher = require('pbkdf2-password')();
+var sha512 = require('sha512')
+// 메일 전송 관련
+var emailService = require('./public/js/verify-email.js')(credentials);
+
 // 게시판 목록 저장
 var _boards = '';
 
@@ -90,7 +98,8 @@ passport.use(new LocalStrategy(
         else{
           // TODO 입력 틀렸을 경우 페이지 만들기
           // 로그인 처리
-          connection.query('select * from member where mbr_Id = ?', username, function(err, rows){
+          connection.query('SELECT CAST(mbr_Id AS CHAR) AS mbr_Id, mbr_Pwd, mbr_Salt, CAST(mbr_Nick AS CHAR) AS mbr_Nick, mbr_Email,'
+                            + '+ mbr_Chance, mbr_Profile, mbr_Date FROM member WHERE mbr_Id = ?', username, function(err, rows){
             if(err){
               console.log('Query Error: ' + err);
               return done(null, false);
@@ -106,6 +115,7 @@ passport.use(new LocalStrategy(
                   // 아이디, 비밀번호 일치
                   if(hash == rows[0].mbr_Pwd){
                     // 회원 정보를 serializeUser(callback)에 보낸다.
+                    console.log(rows[0]);
                     done(null, rows[0]);
                   }
                   // 비밀번호 불일치
@@ -151,7 +161,11 @@ app.post('/outside/returning', passport.authenticate('local', {successRedirect: 
 );
 
 app.get('/outside/moving', function(req, res){
-  res.render('moving', {layout: 'none-moving'});
+  if(req.user){
+      res.redirect('/');
+  }
+  else
+    res.render('moving', {layout: 'none-moving'});
 });
 // 입력 데이터 유효성 검사
 app.post('/filter/id', function(req, res){
@@ -196,32 +210,66 @@ app.post('/filter/email', function(req, res){
     }
   });
 });
-// 입력 데이터 저장
-app.post('/outside/moving', function(req, res){
-  var filter = require('./public/js/datafilter.js');
-  var dbSet;
-  hasher({password: req.body.pwd}, function(err, pass, salt, hash){
-    dbSet = {mbr_Id: req.body.id, mbr_Pwd: hash, mbr_Salt: salt, mbr_Nick: req.body.nick, mbr_EMail: req.body.email};
-    console.log(dbSet);
-    pool.getConnection(function(err, connection){
-      if(err) throw err;
-      else{
-        connection.query("INSERT INTO member SET ?", dbSet,
-        function(err, rows){if(err) console.log('Query Error: ' + err); else console.log('Query Success');});
-      }
-      connection.release();
-    });
-  });
-  // filter에서 유효성 검사를 진행하고, 유효한 값이 아닐 경우 값 전송 자체가
-  // 막히기 때문에 요청이 들어오는 경우는 무조건 redirect하면 된다.
-    res.redirect('/outside/returning');
+// 인증 메일 전송
+app.post('/filter/verify', function(req, res){
+  // 랜덤으로 8자리 수를 만들어 인증 코드로 사용
+  var code = Math.floor(Math.random() * 89999999 + 10000000).toString();
+  // 랜덤으로 4자리 수를 만들어 salt로 사용
+  var salt = sha512(Math.floor(Math.random() * 8999 + 1000).toString());
+  // salt와 salt + key의 암호화 값을 세션에 저장했다가 사용자가 인증 코드를 입력하면 비교한 뒤 삭제하도록 한다.
+  req.session.salt = salt;
+  req.session.key = sha512(code + salt);
+  emailService.sendCode(req.body.user, code);
 });
+// 인증 코드 검사 결과 반환 및 데이터 저장
+app.post('/filter/code', function(req, res){
+  if(sha512(req.body.input_Code + req.session.salt) == req.session.key){
+    var dbSet;
+    hasher({password: req.body.input.pwd}, function(err, pass, salt, hash){
+      dbSet = {mbr_Id: req.body.input.id, mbr_Pwd: hash, mbr_Salt: salt, mbr_Nick: req.body.input.nick, mbr_EMail: req.body.input.email, mbr_Verified: 1};
+      console.log(dbSet);
+      pool.getConnection(function(err, connection){
+        if(err) throw err;
+        else{
+          connection.query("INSERT INTO member SET ?", dbSet,
+          function(err, rows){if(err) console.log('Query Error: ' + err); else console.log('Query Success');});
+        }
+        connection.release();
+      });
+    });
+    res.redirect('/outside/returning');
+  }
+  else{
+    res.json({result: false});
+  }
+});
+// 입력 데이터 저장
+// app.post('/outside/moving', function(req, res){
+//   var filter = require('./public/js/datafilter.js');
+//   var dbSet;
+//   hasher({password: req.body.pwd}, function(err, pass, salt, hash){
+//     dbSet = {mbr_Id: req.body.id, mbr_Pwd: hash, mbr_Salt: salt, mbr_Nick: req.body.nick, mbr_EMail: req.body.email};
+//     console.log(dbSet);
+//     pool.getConnection(function(err, connection){
+//       if(err) throw err;
+//       else{
+//         connection.query("INSERT INTO member SET ?", dbSet,
+//         function(err, rows){if(err) console.log('Query Error: ' + err); else console.log('Query Success');});
+//       }
+//       connection.release();
+//     });
+//   });
+//   // filter에서 유효성 검사를 진행하고, 유효한 값이 아닐 경우 값 전송 자체가
+//   // 막히기 때문에 요청이 들어오는 경우는 무조건 redirect하면 된다.
+//     res.redirect('/outside/returning');
+// });
 
 app.get('/', function(req, res){
   if(!req.user){
       res.redirect('/outside/returning');
   }
   else{
+    // emailService.sendKey('cyzhtkxkd50@naver.com', )
     pool.getConnection(function(err, connection){
       if(err) throw err;
       else{
@@ -340,30 +388,32 @@ app.post('/outside/building-room', function(req, res){
   pool.getConnection(function(err, connection){
     if (err) throw err;
     else{
-      connection.query('SELECT mbr_Nick, mbr_Chance FROM member WHERE mbr_Nick = ?', req.user.mbr_Nick, function(err, rows){
+      connection.query('SELECT CAST(mbr_Nick AS CHAR) AS mbr_Nick, mbr_Chance FROM member WHERE mbr_Nick = ?', req.user.mbr_Nick, function(err, rows){
         if (err) throw err;
         else{
+          console.log(rows[0]);
+          if(req.body['brd-opened'] == 'open')
+           req.body['brd-opened'] = 1;
+          else {
+            req.body['brd-opened'] = 0;
+          }
           if(!rows[0].mbr_Chance){
-            connection.query('INSERT INTO board VALUES (?, default, ?, ?, default, ?)', [req.body['brd-title'], req.body['brd-password'], req.body['brd-opened'], req.user.mbr_Nick], function(err, rows){});
+            console.log(req.body);
+            connection.query('INSERT INTO board VALUES (?, default, ?, ?, default, ?)', [req.body['brd-title'], req.body['brd-password'], req.body['brd-opened'], req.user.mbr_Nick], function(err, rows){if (err) throw err;});
+            connection.query('INSERT INTO post VALUES (?, default, "Read me", ?, default, ?, default)', [req.body['brd-title'], req.body['brd-explain'], req.user.mbr_Nick], function(err, rows){if (err) throw err;});
+            connection.query('UPDATE member SET mbr_Chance = 1 WHERE mbr_Nick = ?', req.user.mbr_Nick, function(err, rows){if (err) throw err;});
           }
           else{
             console.log('You\'ve made board before');
           }
         }
         connection.release();
-        res.redirect('/');
       });
     }
   });
+  res.redirect('/');
 });
 
-// app.get('/outside', function(req, res){
-//   req.logout();
-//   req.session.destroy(function(err){
-//     if (err) throw err;
-//     res.redirect('/outside/returning');
-//   });
-// });
 app.get('/outside', function(req, res){
   req.logout();
   res.redirect('/outside/returning');

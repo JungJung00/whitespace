@@ -3,26 +3,32 @@
     <ul>
       <label for="id" class="burden-label">ID</label>
       <li class="form-moving tip">
-        <input type="text" name="id" placeholder="Pollaco12" id="input-id" class="form-input"><span class="tip-text">경고</span>
+        <input type="text" name="id" placeholder="Pollaco12" id="input-id" class="form-input"><span class="tip-text"></span>
       </li>
       <label for="pwd">Password</label>
       <li class="form-moving tip">
-        <input type="password" name="pwd" placeholder="qwerty" id="input-pwd" class="form-input"><span class="tip-text">경고</span>
+        <input type="password" name="pwd" placeholder="qwerty" id="input-pwd" class="form-input"><span class="tip-text"></span>
       </li>
       <div id="pwdck-slider">
         <label for="pwdck">Password Check</label>
         <li class="form-moving tip">
-          <input type="password" name="pwdck" placeholder="qwerty" id="input-pwdck" class="form-input"><span class="tip-text">경고</span>
+          <input type="password" name="pwdck" placeholder="qwerty" id="input-pwdck" class="form-input"><span class="tip-text"></span>
         </li>
       </div>
       <label for="nick">Nick Name</label>
       <li class="form-moving tip">
-        <input type="text" name="nick" placeholder="Pollaco" id="input-nick" class="form-input"><span class="tip-text">경고</span>
+        <input type="text" name="nick" placeholder="Pollaco" id="input-nick" class="form-input"><span class="tip-text"></span>
       </li>
       <label for="email">E-mail</label>
       <li class="form-moving tip">
-        <input type="email" name="email" placeholder="Pollaco@gmail.com" id="input-email" class="form-input"><span class="tip-text">경고</span>
+        <input type="email" name="email" placeholder="Pollaco@gmail.com" id="input-email" class="form-input"><span class="tip-text"></span>
       </li>
+      <div id="keyck-slider">
+        <label for="keyck">Authenticate Key Check</label>
+        <li class="form-moving tip">
+          <input type="text" name="keyck" placeholder="..." id="input-keyck" class="form-input"><span class="tip-text"></span>
+        </li>
+      </div>
     </ul>
   </form>
   <span><h3>Press <span class="enter">enter</span> to finish moving</h3></span>
@@ -39,6 +45,7 @@ $(document).ready(function(){
     switch(event.keyCode){
       case 13:
       $('#input-pwd').focus();
+      break;
     }
   });
   $('#input-pwd').on('textchange', function(){
@@ -47,6 +54,7 @@ $(document).ready(function(){
     switch(event.keyCode){
       case 13:
       $('#input-pwdck').focus();
+      break;
     }
   });
   $('#input-pwdck').on('textchange', function(){
@@ -55,6 +63,7 @@ $(document).ready(function(){
     switch(event.keyCode){
       case 13:
       $('#input-nick').focus();
+      break;
     }
   });
   $('#input-nick').on('textchange', function(){
@@ -64,6 +73,7 @@ $(document).ready(function(){
     switch(event.keyCode){
       case 13:
       $('#input-email').focus();
+      break;
     }
   });
   $('#input-email').on('textchange', function(){
@@ -72,12 +82,27 @@ $(document).ready(function(){
   }).on('keydown', function(event){
     switch(event.keyCode){
       case 13:
-      if(check)
-        document.submitter.submit();
-      else
-        alert('Input valid data');
+        if(check){verifyEmail();}
+        break;
     }
   });
+  $('#input-keyck').on('textchange', function(){
+    if($('#input-keyck').val().length != 8){
+      $('#input-keyck + span').text('Input Code that 8 long numbers')
+                             .fadeIn({duration: 1000, queue: false});
+    }
+    else{
+      $('#input-keyck + span').text('Accepted').fadeOut({duration: 4000, queue: false});
+      $('#input-keyck').css('border-color', '#19FF5E');
+      $('#input-keyck').on('keydown', function(event){
+        switch(event.keyCode){
+          case 13:
+            verifyCode();
+            break;
+        }
+      })
+    }
+  })
 });
 </script>
 <script type="text/javascript" src="/js/jquery.splendid.textchange.js"></script>
