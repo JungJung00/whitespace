@@ -1,107 +1,236 @@
-// TODO alert 대신 메시지 사용자에게 표시할 방법 생각하기.
-// => 폼에 입력하고 포커스 아웃 했을 때 값 비교?
-exports.dataFilter = function(data, connection){
+// TODO success 호출 뒤 값을 return하는 방법을 알 수가 없어 일단 async:false로 동기식으로 진행함...ㅠㅜㅠㅜㅜㅠㅜㅍ러ㅜㅊ타퍼ㅜ푸탚ㄴㅍㅌㅋㅋㅋㅌㅋㅋㅋㅋㅌㅋㅋㅋㅋ
+// ID 유효성 검사
+function idFilter(){
   var check = false;
-  /*
-   * 한글 검사 : [ㄱ-ㅎㅏ-ㅣ가-힣]
-   * 특수 문자 및 공백 문자: [\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"\s]
-   * 이메일 : /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/
-  */
-
-  // ID 유효성 검사
   // 값이 입력되었는가
-  if(data.id == ""){
-    alert('Please input data');
+  if($('#input-id').val() == ""){
+    $('#input-id + span').text('Input value')
+                         .fadeIn({duration: 1000, queue: false});
+    $('#input-id').css('border-color', '#FF4040');
     return check;
   }
   // 한글이 포함되었는가
-  else if(data.id.match(/[ㄱ-ㅎㅏ-ㅣ가-힣]/)){
-    alert('Please input only English with special letter \'_\'');
+  else if($('#input-id').val().match(/[ㄱ-ㅎㅏ-ㅣ가-힣]/)){
+    $('#input-id + span').text('Input only English or \'_\'')
+                         .fadeIn({duration: 1000, queue: false});
+    $('#input-id').css('border-color', '#FF4040');
     return check;
   }
-  // 특수문자나 공백이 포함되었는가
-  else if(!data.id.match(/[\{\}\[\]\/?.,;:|\)*~`!^\-+<>@\#$%&\\\=\(\'\"\s]/)){
-    alert('Don\'t input special letters except for \'_\' or white space');
+  // 특수문자가 포함되었는가
+  else if($('#input-id').val().match(/[\{\}\[\]\/?.,;:|\)*~`!^\-+<>@\#$%&\\\=\(\'\"]/)){
+    $('#input-id + span').text('Don\'t input special letters except for \'_\'')
+                         .fadeIn({duration: 1000, queue: false});
+    $('#input-id').css('border-color', '#FF4040');
+    return check;
+  }
+  // 공백이 포함되었는가
+  else if($('#input-id').val().match(/\s/)){
+    $('#input-id + span').text('Don\'t input white space')
+                         .fadeIn({duration: 1000, queue: false});
+    $('#input-id').css('border-color', '#FF4040');
+    return check;
+  }
+  // 6 ~ 20자인가
+  else if(($('#input-id').val().length < 6) || ($('#input-id').val().length > 20)){
+    $('#input-id + span').text('Input value between 6 and 20 characters long')
+                         .fadeIn({duration: 1000, queue: false});
+    $('#input-id').css('border-color', '#FF4040');
     return check;
   }
   // 중복 검사
-  connection.query('select mbr_Id from member where mbr_Id = ?', data.id, function(err, rows){
-    if(rows.length != 0){
-      alert('This ID is already given. Try others.');
-    }
-    else{
-      // TODO input border 색 초록으로 바꾸기
-      check = true;
+  $.ajax({
+    url: '/filter/id',
+    type: 'post',
+    data: {input_Id: $('#input-id').val()},
+    dataType: 'json',
+    async: false,
+    success: function(data){
+      if(!data.isThere){
+        $('#input-id + span').text('Accepted').fadeOut(4000);
+        $('#input-id').css('border-color', '#19FF5E');
+        check = true;
+      }
+      else{
+        // alert('This ID is already given. Try others.');
+        $('#input-id + span').text('Already using ID. Try others')
+                             .fadeIn({duration: 1000, queue: false});
+        $('#input-id').css('border-color', '#FF4040');
+      }
     }
   });
-  if(check == false) return check;
-
-  check = false;
-  // PASSWORD 유효성 검사
-    if(data.pwd == ""){
-      alert('Please input data');
-      return check;
+  return check;
+}
+// PASSWORD 유효성 검사
+function pwdFilter(){
+    // 값이 입력됐는가
+    if($('#input-pwd').val() == ""){
+      $('#input-pwd + span').text('Input value')
+                            .fadeIn({duration: 1000, queue: false});
+      $('#input-pwd').css('border-color', '#FF4040');
+      if($('#pwdck-slider').css('display') == 'block'){
+        $('#input-pwdck').val('');
+        $('#pwdck-slider').slideUp({duration: 800, queue: false});
+      }
+      return check = false;
     }
-    // 대소문자를 섞었는가
-    else if(!(data.pwd.match(/[a-z]/) && data.pwd.match(/[A-Z]/) && data.pwd.match(/[0-9]/))){
-      alert('Please mix lower case, upper case and number');
-      return check;
+    // 대소문자, 숫자를 섞었는가
+    else if(!($('#input-pwd').val().match(/[a-z]/) && $('#input-pwd').val().match(/[A-Z]/) && $('#input-pwd').val().match(/[0-9]/))){
+      $('#input-pwd + span').text('Mix lower case, upper case and number')
+                            .fadeIn({duration: 1000, queue: false});
+      $('#input-pwd').css('border-color', '#FF4040');
+      if($('#pwdck-slider').css('display') == 'block'){
+        $('#input-pwdck').val('');
+        $('#pwdck-slider').slideUp({duration: 800, queue: false});
+      }
+      return check = false;
     }
     // 한글이 포함되었는가
-    else if(data.pwd.match(/[ㄱ-ㅎㅏ-ㅣ가-힣]/)){
-      alert('Please input only English with special letters');
-      return check;
+    else if($('#input-pwd').val().match(/[ㄱ-ㅎㅏ-ㅣ가-힣]/)){
+      $('#input-pwd + span').text('Input only English or \'_\'')
+                            .fadeIn({duration: 1000, queue: false});
+      $('#input-pwd').css('border-color', '#FF4040');
+      if($('#pwdck-slider').css('display') == 'block'){
+        $('#input-pwdck').val('');
+        $('#pwdck-slider').slideUp({duration: 800, queue: false});
+      }
+      return check = false;
     }
     // 특수문자가 포함되었는가
-    else if(!data.pwd.match(/[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"]/)){
-      alert('Please mix special letters');
-      return check;
+    else if(!$('#input-pwd').val().match(/[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"]/)){
+      $('#input-pwd + span').text('Mix special letters')
+                            .fadeIn({duration: 1000, queue: false});
+      $('#input-pwd').css('border-color', '#FF4040');
+      if($('#pwdck-slider').css('display') == 'block'){
+        $('#input-pwdck').val('');
+        $('#pwdck-slider').slideUp({duration: 800, queue: false});
+      }
+      return check = false;
+    }
+    // 공백이 포함되었는가
+    else if($('#input-pwd').val().match(/\s/)){
+      $('#input-pwd + span').text('Don\'t input white space')
+                            .fadeIn({duration: 1000, queue: false});
+      $('#input-pwd').css('border-color', '#FF4040');
+      if($('#pwdck-slider').css('display') == 'block'){
+        $('#input-pwdck').val('');
+        $('#pwdck-slider').slideUp({duration: 800, queue: false});
+      }
+      return check = false;
     }
     // 6 ~ 20자인가
-    else if(!data.pwd.match(/[a-zA-Z0-9_]{6,20}/)){
-      alert('Please input only 6 ~ 20 letters');
-      return check;
+    else if(($('#input-pwd').val().length < 6) || ($('#input-pwd').val().length > 20)){
+      $('#input-pwd + span').text('Input value between 6 and 20 characters long')
+                            .fadeIn({duration: 1000, queue: false});
+      $('#input-pwd').css('border-color', '#FF4040');
+      if($('#pwdck-slider').css('display') == 'block'){
+        $('#input-pwdck').val('');
+        $('#pwdck-slider').slideUp({duration: 800, queue: false});
+      }
+      return check = false;
     }
     else{
-      // TODO 비밀번호 확인 input 만들기. 맞으면 border 녹색으로
-      check = true;
+      $('#input-pwd + span').text('Accepted').fadeOut(2000);
+      $('#input-pwd').css('border-color', '#19FF5E');
+      $('#pwdck-slider').slideDown({duration: 800, queue: false});
+      return check = true;
     }
-    if(check == false) return check;
-
-  // NICKNAME 유효성 검사
-    check = false;
-    // 중복 검사
-    connection.query('select mbr_Nick from member where mbr_Nick = ?', data.nick, function(err, rows){
-      if(rows.length != 0){
-        alert('This Nickname is already given. Try others.');
-      }
-      else{
-        // TODO border 녹색으로
-        check = true;
-      }
-    });
-    if(check == false) return check;
-
-  // E-MAIL 유효성 검사
-    check = false;
-    // 이메일 유효성 검사
-    if(!data.email.match(/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/)){
-      alert('Please input valid email');
-      return check;
-    }
-    // 중복검사
-    connection.query('select mbr_Email from member where mbr_Email = ?', data.email, function(err, rows){
-      if(rows.length){
-        alert('This Email is already using. Try others.');
-      }
-      else{
-        // TODO border 녹색으로
-        check = true;
-      }
-    });
-    if(check == false) return check;
-
-    // 검사가 끝났으므로 무조건 retrun
-    // false : 비유효  true : 유효
-    return check;
 }
+// PASSWORD CHECK 유효성 검사
+function pwdckFilter(){
+  // pwd와 값이 다를 때
+  if($('#input-pwd').val() != $('#input-pwdck').val()){
+    $('#input-pwdck + span').text('It is different to above!')
+                         .fadeIn({duration: 1000, queue: false});
+    $('#input-pwd').css('border-color', '#FF4040');
+    $('#input-pwdck').css('border-color', '#FF4040');
+    return check = false;
+  }
+  else{
+    $('#input-pwdck + span').text('Accepted').fadeOut(4000);
+    $('#input-pwd').css('border-color', '#19FF5E');
+    $('#input-pwdck').css('border-color', '#19FF5E');
+    return check = true;
+  }
+}
+// NICKNAME 유효성 검사
+function nickFilter(){
+  var check = false;
+  // 문자열 바이트 계산
+  // 한글 : 3바이트, 영어-특수문자 : 1바이트
+  function getByte(s){
+    var b, i;
+    var c;
+    for(b=i=0;c=s.charCodeAt(i++);b+=c>>11?3:c>>7?2:1);
+    return b;
+  }
+  if($('#input-nick').val() == ""){
+    // alert('Please input data');
+    $('#input-nick + span').text('Input value')
+                         .fadeIn({duration: 1000, queue: false});
+    $('#input-nick').css('border-color', '#FF4040');
+    return check;
+  }
+  // 4 ~ 30 바이트 외
+  // 한글 10자, 영어 30자
+  else if(getByte($('#input-nick').val()) < 4 || getByte($('#input-nick').val()) > 30){
+    $('#input-nick + span').text('Input value between 4 and 30 Bytes long')
+                         .fadeIn({duration: 1000, queue: false});
+    $('#input-nick').css('border-color', '#FF4040');
+    return check;
+  }
+  // 중복 검사
+  $.ajax({
+    url: '/filter/nick',
+    type: 'post',
+    data: {input_Nick: $('#input-nick').val()},
+    dataType: 'json',
+    async: false,
+    success: function(data){
+      if(!data.isThere){
+        $('#input-nick + span').text('Accepted').fadeOut(4000);
+        $('#input-nick').css('border-color', '#19FF5E');
+        check = true;
+      }
+      else{
+        $('#input-nick + span').text('Already using Nick. Try others')
+                             .fadeIn({duration: 1000, queue: false});
+        $('#input-nick').css('border-color', '#FF4040');
+      }
+    }
+  });
+  return check;
+  // connection.query('select mbr_Nick from member where mbr_Nick = ?', $('#input-nick').val(), function(err, rows){
+}
+
+// 이메일 유효성 검사
+function emailFilter(){
+  var check = false;
+  if(!$('#input-email').val().match(/^([a-zA-Z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/)){
+    $('#input-email + span').text('Input valid email')
+                         .fadeIn({duration: 1000, queue: false});
+    $('#input-email').css('border-color', '#FF4040');
+    return check;
+  }
+  // 중복검사
+  $.ajax({
+    url: '/filter/email',
+    type: 'post',
+    data: {input_Email: $('#input-email').val()},
+    dataType: 'json',
+    async: false,
+    success: function(data){
+      if(!data.isThere){
+        $('#input-email + span').text('Accepted').fadeOut(4000);
+        $('#input-email').css('border-color', '#19FF5E');
+        check = true;
+      }
+      else{
+        $('#input-email + span').text('Already using E-mail. Try others')
+                             .fadeIn({duration: 1000, queue: false});
+        $('#input-email').css('border-color', '#FF4040');
+      }
+    }
+  });
+  return check;
+}
+// connection.query('select mbr_Email from member where mbr_Email = ?', $('#input-email').val(), function(err, rows){

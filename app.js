@@ -4,20 +4,25 @@
 var express = require('express');
 var app = express();
 var handlebars = require('express-handlebars').create({defaultLayout:'main'});
+var credentials = require('./credentials.js')
+var cookieParser = require('cookie-parser');
+var session = require('express-session');
+var MySQLStore = require('express-mysql-session')(session);
 var mysql = require('mysql');
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
 // 커넥션 풀 생성 : 필요할 때마다 연결
-var pool = mysql.createPool({
+var dbOption = {
   host: 'localhost',
   user: 'root',
   port: 3306,
   password: 'ehehgks!!123',
   database: 'whitespace',
   connectionLimit: 10
-});
+}
+var pool = mysql.createPool(dbOption);
 // 게시판 목록 저장
 var _boards = '';
-// 비동기 순서 체크용
-var test = 0;
 
 /****페이징****/
 
@@ -43,7 +48,16 @@ var page = 5;
 
 // static 미들웨어, 정적 자원 디렉토리 지정
 app.use(express.static(__dirname + '/public'))
-   .use(require('body-parser').urlencoded({extended: true}));
+   .use(require('body-parser').urlencoded({extended: true}))
+   .use(cookieParser(credentials.cookieSecret))
+   .use(session({
+     secret: credentials.cookieSecret,
+     resave: false,
+     saveUninitialized: false,
+     store: new MySQLStore(dbOption)
+   }))
+   .use(passport.initialize())
+   .use(passport.session())
 
 // 뷰 엔진 핸들바 설정
 app.engine('handlebars', handlebars.engine)
@@ -69,57 +83,162 @@ app.get('/test', function(req, res){
 });
 app.post('/test', function(req, res){
   console.log(req.body.test);
-  res.redirect('/test');
 });
 
-app.get('/outside/returning', function(req, res){
- res.render('returning', {layout: 'none'});
-})
-app.post('/outside/returning', function(req, res) {
-  pool.getConnection(function(err, connection){
-    if(err) throw err;
-    else{
-      // 로그인 처리
-      connection.query('select * from member where mbr_Id = ?', req.body.id, function(err, rows){
-        if(err){
-          console.log('Query Error: ' + err);
-          redirect('/outside/returning');
-        }
+// 자체 회원 인증
+passport.use(new LocalStrategy(
+  function(username, password, done){
+    pool.getConnection(function(err, connection){
+        if(err) throw err;
         else{
-          // 아이디 불일치
-          if(rows.length == 0){
-            console.log('\n\nThere is no ID that you typed');
-            res.redirect('/outside/returning');
-          }
-          else{
-            // 아이디, 비밀번호 일치
-            if(req.body.pwd == rows[0].mbr_Pwd){
-              console.log('\n\nWelcome ' + rows[0].mbr_Nick + '!');
-              res.redirect('/');
+          // TODO 입력 틀렸을 경우 페이지 만들기
+          // 로그인 처리
+          connection.query('select * from member where mbr_Id = ?', username, function(err, rows){
+            if(err){
+              console.log('Query Error: ' + err);
+              done(null, false);
             }
-            // 비밀번호 불일치
             else{
-              console.log('\n\nWrong password!');
-              res.redirect('/outside/returning');
+              // 아이디 불일치
+              if(!rows.length){
+                console.log('\n\nThere is no ID that you typed');
+                done(null, false);
+              }
+              else{
+                // 아이디, 비밀번호 일치
+                if(password == rows[0].mbr_Pwd){
+                  // 회원 정보를 serializeUser(callback)에 보낸다.
+                  done(null, rows[0])
+                }
+                // 비밀번호 불일치
+                else{
+                  console.log('\n\nWrong password');
+                  done(null, false);
+                }
+              }
             }
-          }
+          });
+          connection.release();
         }
       });
-      connection.release();
+      // done(null, false);
+  }
+));
+// done이 false가 아닐 경우 실행
+// 사용자의 세션(닉네임)을 저장한다.
+passport.serializeUser(function(user, done){
+  console.log('serialize');
+  done(null, user);
+});
+// 세션이 이미 저장되어 있을 경우
+passport.deserializeUser(function(user, done){
+  // req의 객체 user에 저장. user객체는 passport가 새로 추가하는 객체.
+  console.log('deserialize');
+  done(null, user);
+});
+app.get('/outside/returning', function(req, res){
+  if(req.user){
+    console.log('there is a session');
+    res.redirect('/');
+  }
+  else{
+    res.render('returning', {layout: 'none-returning'});
+  }
+});
+app.post('/outside/returning', passport.authenticate('local', {successRedirect: '/',
+                                                               failureRedirect: '/outside/returning',
+                                                               failureFlash: false})
+);
+// app.post('/outside/returning', function(req, res) {
+//   pool.getConnection(function(err, connection){
+//     if(err) throw err;
+//     else{
+//       // TODO 입력 틀렸을 경우 페이지 만들기
+//       // 로그인 처리
+//       connection.query('select * from member where mbr_Id = ?', req.body.username, function(err, rows){
+//         if(err){
+//           console.log('Query Error: ' + err);
+//           redirect('/outside/returning');
+//         }
+//         else{
+//           // 아이디 불일치
+//           if(!rows.length){
+//             console.log('\n\nThere is no ID that you typed');
+//             res.redirect('/outside/returning');
+//           }
+//           else{
+//             // 아이디, 비밀번호 일치
+//             if(req.body.password == rows[0].mbr_Pwd){
+//               // 로그인 성공 시 세션 생성
+//               req.session.Nick = rows[0].mbr_Nick;
+//               console.log('\n\nWelcome ' + req.session.Nick + '!');
+//               res.redirect('/');
+//             }
+//             // 비밀번호 불일치
+//             else{
+//               console.log('\n\nWrong password!');
+//               res.redirect('/outside/returning');
+//             }
+//           }
+//         }
+//       });
+//       connection.release();
+//     }
+//   });
+// });
+
+app.get('/outside/moving', function(req, res){
+  res.render('moving', {layout: 'none-moving'});
+});
+// 입력 데이터 유효성 검사
+app.post('/filter/id', function(req, res){
+  pool.getConnection(function(err, connection){
+    if (err) throw err;
+    else{
+      connection.query('SELECT mbr_Id FROM member where mbr_Id = ?', req.body.input_Id, function(err, rows){
+        if (err) throw err;
+        else{
+          res.json({isThere: rows.length});
+        }
+        connection.release();
+      });
     }
   });
 });
-
-app.get('/outside/moving', function(req, res){
-  res.render('moving', {layout: 'none'});
+app.post('/filter/nick', function(req, res){
+  pool.getConnection(function(err, connection){
+    if (err) throw err;
+    else{
+      connection.query('select mbr_Nick from member where mbr_Nick = ?', req.body.input_Nick, function(err, rows){
+        if (err) throw err;
+        else{
+          res.json({isThere: rows.length});
+        }
+        connection.release();
+      });
+    }
+  });
 });
+app.post('/filter/email', function(req, res){
+  pool.getConnection(function(err, connection){
+    if(err) throw err;
+    else{
+      connection.query('select mbr_Email from member where mbr_Email = ?', req.body.input_Email, function(err, rows){
+        if(err) throw err;
+        else{
+          res.json({isThere: rows.length});
+        }
+        connection.release();
+      });
+    }
+  });
+});
+// 입력 데이터 저장
 app.post('/outside/moving', function(req, res){
   var filter = require('./public/js/datafilter.js');
-  var check = false;
   pool.getConnection(function(err, connection){
-    check = filter.dataFilter(req.body, connection);
     if(err) throw err;
-    else if(check){
+    else{
       bd = req.body;
       dbSet = {mbr_Id: req.body.id, mbr_Pwd: req.body.pwd, mbr_Nick: req.body.nick, mbr_EMail: req.body.email};
       connection.query("INSERT INTO member SET ?", dbSet,
@@ -128,8 +247,9 @@ app.post('/outside/moving', function(req, res){
     connection.release();
   });
   console.log(req.body);
-  if(check) res.redirect('/outside/returning');
-  else res.redirect('/outside/moving');
+  // filter에서 유효성 검사를 진행하고, 유효한 값이 아닐 경우 값 전송 자체가
+  // 막히기 때문에 요청이 들어오는 경우는 무조건 redirect하면 된다.
+  res.redirect('/outside/returning');
 });
 
 app.get('/', function(req, res){
@@ -230,9 +350,26 @@ app.post('/Post', function(req, res){
   });
 });
 
-app.post('/outside/building-room', function(req, res){
-
-})
+// app.post('/outside/building-room', function(req, res){
+//   pool.getConnection(function(err, connection){
+//     if (err) throw err;
+//     else{
+//       connection.query('SELECT mbr_Nick, mbr_Chance FROM member WHERE mbr_Nick = ?', 세션 구현하면 그 값으로 채우기, function(err, rows){
+//         if (err) throw err;
+//         else{
+//           if(!rows[0].mbr_Chance){
+//             connection.query('INSERT INTO board VALUES (?, default, ?, ?, default, ?)', [게시판 이름, 게시판 비밀번호, 게시판 성향, 게시판 작성자], function(err, rows){});
+//           }
+//           else{
+//             console.log('You\'ve made board before');
+//           }
+//         }
+//         connection.release();
+//         res.redirect('/');
+//       });
+//     }
+//   });
+// });
 
 /***************************************/
 
