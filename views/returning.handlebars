@@ -35,7 +35,7 @@
     });
 
     $('#login-pwd').on('textchange', function(){
-      if($('#login-pwd').val().length < 6 || $('#login-pwd').val().length > 20){
+      if($('#login-pwd').val().length < 6 || $('#login-pwd').val().length > 40){
         $('#warning h1').text('Input 6 ~ 20').fadeIn({duration:1000, queue: false});
         $('#login-pwd').css('border-color', '#FF4040');
         checkPwd = false;

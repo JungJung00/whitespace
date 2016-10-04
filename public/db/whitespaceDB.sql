@@ -5,8 +5,9 @@ USE whitespace;
    # If there is a constraint, it will be lower web
    # So, droped whole constraint.
 CREATE TABLE member(
-	mbr_Id			VARCHAR(20) NOT NULL UNIQUE,
-    mbr_Pwd			VARCHAR(20) NOT NULL,
+	  mbr_Id			VARCHAR(20) NOT NULL UNIQUE,
+    mbr_Pwd			VARCHAR(255) NOT NULL,
+    mbr_Salt    VARCHAR(255) NOT NULL,
     mbr_Nick		VARCHAR(30) NOT NULL UNIQUE,
     mbr_EMail		VARCHAR(100) NOT NULL UNIQUE,
     mbr_Verified	BOOLEAN NOT NULL DEFAULT FALSE,
