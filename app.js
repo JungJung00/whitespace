@@ -99,14 +99,18 @@ passport.use(new LocalStrategy(
           // TODO 입력 틀렸을 경우 페이지 만들기
           // 로그인 처리
           connection.query('SELECT CAST(mbr_Id AS CHAR) AS mbr_Id, mbr_Pwd, mbr_Salt, CAST(mbr_Nick AS CHAR) AS mbr_Nick, mbr_Email,'
-                            + '+ mbr_Chance, mbr_Profile, mbr_Date FROM member WHERE mbr_Id = ?', username, function(err, rows){
+                            + 'mbr_Verified + mbr_Chance, mbr_Profile, mbr_Date FROM member WHERE mbr_Id = ?', username, function(err, rows){
             if(err){
               console.log('Query Error: ' + err);
               return done(null, false);
             }
             else{
+              if(rows[0].mbr_Verified = 0){
+                console.log('Not verified. Please check your mail');
+                return done(null, false);
+              }
               // 아이디 불일치
-              if(!rows.length){
+              else if(!rows.length){
                 console.log('\n\nThere is no ID that you typed');
                 return done(null, false);
               }
@@ -213,56 +217,86 @@ app.post('/filter/email', function(req, res){
 // 인증 메일 전송
 app.post('/filter/verify', function(req, res){
   // 랜덤으로 8자리 수를 만들어 인증 코드로 사용
-  var code = Math.floor(Math.random() * 89999999 + 10000000).toString();
-  // 랜덤으로 4자리 수를 만들어 salt로 사용
-  var salt = sha512(Math.floor(Math.random() * 8999 + 1000).toString());
+  var code = Math.floor(Math.random() * 8999999 + 1000000).toString();
+  hasher({password: code}, function(err, pass, salt, hash){
+    if (err) throw err;
+    // 인증 url 전송
+    hash = hash.replace(/\//g, '');
+    emailService.sendCode(req.body.user, 'localhost:3001/auth/' + hash);
+    res.json({code: hash});
+  });
   // salt와 salt + key의 암호화 값을 세션에 저장했다가 사용자가 인증 코드를 입력하면 비교한 뒤 삭제하도록 한다.
-  req.session.salt = salt;
-  req.session.key = sha512(code + salt);
-  emailService.sendCode(req.body.user, code);
 });
-// 인증 코드 검사 결과 반환 및 데이터 저장
-app.post('/filter/code', function(req, res){
-  if(sha512(req.body.input_Code + req.session.salt) == req.session.key){
-    var dbSet;
-    hasher({password: req.body.input.pwd}, function(err, pass, salt, hash){
-      dbSet = {mbr_Id: req.body.input.id, mbr_Pwd: hash, mbr_Salt: salt, mbr_Nick: req.body.input.nick, mbr_EMail: req.body.input.email, mbr_Verified: 1};
-      console.log(dbSet);
-      pool.getConnection(function(err, connection){
-        if(err) throw err;
-        else{
-          connection.query("INSERT INTO member SET ?", dbSet,
-          function(err, rows){if(err) console.log('Query Error: ' + err); else console.log('Query Success');});
-        }
-        connection.release();
-      });
+// 인증 코드 검사 결과 반환 및 데이터 저장 : url 인증 방식으로 변경
+// app.post('/filter/code', function(req, res){
+//   var check;
+//   console.log('body inputCode : ' + req.body.input_Code);
+//   console.log('session salt : ' + req.session.salt)
+//   hasher({password: req.body.input_Code, salt: req.session.salt}, function(err, pass, salt, hash){
+//     if (err) throw err;
+//     console.log('hash : ' + hash);
+//     console.log('key : ' + req.session.key);
+//     // console.log('session key' + req.session.key);
+//     if (hash == req.session.key)
+//       res.json({result : check = true});
+//     else {
+//       res.json({result : check = false});
+//     }
+//   });
+// });
+app.get('/auth/:code', function(req, res){
+  console.log('into!!!');
+  pool.getConnection(function(err, connection){
+    if (err) throw err;
+    console.log(req.params.code);
+    connection.query('SELECT * FROM member WHERE mbr_Code = ?', req.params.code, function(err, rows){
+      if(err) throw err;
+      // db에 코드를 가지는 회원이 없을 때
+      if(!rows[0]){
+        res.render('auth-not-valid', {layout:'none'});
+      }
+      // 이미 인증된 회원이라면 로그인 페이지로 이동
+      else if(rows[0].mbr_Verified){
+        res.render('auth-already', {layout:'none', nick: rows[0].mbr_Nick});
+      }
+      // 코드에 해당하는 회원을 찾았을 경우 인증됨으로 갱신
+      else if(rows[0]){
+        console.log('find!');
+        connection.query('UPDATE member SET mbr_Verified = 1 WHERE mbr_Code = ?', req.params.code, function(err, rows){
+          if (err) throw err;
+        });
+        connection.query('UPDATE member SET mbr_Code = "" WHERE mbr_Code = ?', req.params.code, function(err, rows){
+          if (err) throw err;
+        });
+        res.render('auth-verify', {layout:'none', nick: rows[0].mbr_Nick});
+      }
     });
-    res.redirect('/outside/returning');
-  }
-  else{
-    res.json({result: false});
-  }
+    connection.release();
+  });
 });
 // 입력 데이터 저장
-// app.post('/outside/moving', function(req, res){
-//   var filter = require('./public/js/datafilter.js');
-//   var dbSet;
-//   hasher({password: req.body.pwd}, function(err, pass, salt, hash){
-//     dbSet = {mbr_Id: req.body.id, mbr_Pwd: hash, mbr_Salt: salt, mbr_Nick: req.body.nick, mbr_EMail: req.body.email};
-//     console.log(dbSet);
-//     pool.getConnection(function(err, connection){
-//       if(err) throw err;
-//       else{
-//         connection.query("INSERT INTO member SET ?", dbSet,
-//         function(err, rows){if(err) console.log('Query Error: ' + err); else console.log('Query Success');});
-//       }
-//       connection.release();
-//     });
-//   });
-//   // filter에서 유효성 검사를 진행하고, 유효한 값이 아닐 경우 값 전송 자체가
-//   // 막히기 때문에 요청이 들어오는 경우는 무조건 redirect하면 된다.
-//     res.redirect('/outside/returning');
-// });
+app.post('/outside/moving', function(req, res){
+  console.log('into');
+  var dbSet;
+  hasher({password: req.body.user.pwd}, function(err, pass, salt, hash){
+    dbSet = {mbr_Id: req.body.user.id, mbr_Pwd: hash, mbr_Salt: salt, mbr_Code: req.body.codes , mbr_Nick: req.body.user.nick, mbr_EMail: req.body.user.email};
+    pool.getConnection(function(err, connection){
+      if(err) throw err;
+      else{
+        console.log('saveinto');
+        connection.query("INSERT INTO member SET ?", dbSet,
+        function(err, rows){if(err) console.log('Query Error: ' + err); else console.log('Query Success');});
+      }
+      connection.release();
+      console.log('out');
+      res.redirect('/outside/returning');
+    });
+  });
+  console.log('outt');
+  // filter에서 유효성 검사를 진행하고, 유효한 값이 아닐 경우 값 전송 자체가
+  // 막히기 때문에 요청이 들어오는 경우는 무조건 redirect하면 된다.
+    // res.redirect('/outside/returning');
+});
 
 app.get('/', function(req, res){
   if(!req.user){
@@ -285,6 +319,19 @@ app.get('/', function(req, res){
       connection.release();
     });
   }
+});
+app.post('/board/verify', function(req, res){
+  pool.getConnection(function(err, connection){
+    if (err) throw err;
+    connection.query('SELECT brd_Opened FROM board WHERE brd_Title = ?', req.body['brd-title'], function(err, rows){
+      if (err) throw err;
+      if (rows[0].brd_Opened)
+        res.json({Opened : true});
+      else
+        res.json({Opened: false});
+    });
+    connection.release();
+  });
 });
 app.post('/Page', function(req, res){
   // TODO 중복 코드 모듈화 가능한지 생각 : 그냥 통짜로 모듈화 했을 땐 rows 등의 변수를 사용 못함
@@ -398,8 +445,10 @@ app.post('/outside/building-room', function(req, res){
             req.body['brd-opened'] = 0;
           }
           if(!rows[0].mbr_Chance){
-            console.log(req.body);
-            connection.query('INSERT INTO board VALUES (?, default, ?, ?, default, ?)', [req.body['brd-title'], req.body['brd-password'], req.body['brd-opened'], req.user.mbr_Nick], function(err, rows){if (err) throw err;});
+            hasher({password: req.body['brd-password']}, function(err, pass, salt, hash){
+              if(err) throw err;
+              connection.query('INSERT INTO board VALUES (?, default, ?, ?, default, ?)', [req.body['brd-title'], hash, req.body['brd-opened'], req.user.mbr_Nick], function(err, rows){if (err) throw err;});
+            });
             connection.query('INSERT INTO post VALUES (?, default, "Read me", ?, default, ?, default)', [req.body['brd-title'], req.body['brd-explain'], req.user.mbr_Nick], function(err, rows){if (err) throw err;});
             connection.query('UPDATE member SET mbr_Chance = 1 WHERE mbr_Nick = ?', req.user.mbr_Nick, function(err, rows){if (err) throw err;});
           }
@@ -411,7 +460,8 @@ app.post('/outside/building-room', function(req, res){
       });
     }
   });
-  res.redirect('/');
+  // TODO 게시판 새로고침 안됨
+  res.redirect(req.get('referer'));
 });
 
 app.get('/outside', function(req, res){

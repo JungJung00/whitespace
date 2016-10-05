@@ -234,36 +234,50 @@ function emailFilter(){
   return check;
 }
 
-// 인증 코드 이메일 전송
+// 인증 url 이메일 전송
 function verifyEmail(){
-  $('#keyck-slider').slideDown({duration: 800, queue: false});
-  $('#input-keyck').focus();
   $.ajax({
     url: '/filter/verify',
     type: 'post',
     data: {user: $('#input-email').val()},
     dataType: 'json',
-    success: function(){
-      $('#input-email + span').text('Key sended to your E-mail. Check and input.')
-                           .fadeIn({duration: 1000, queue: false});
+    success: function(data){
+      moving(data.code);
+      // alert('Send authenticate url to your E-mail. Check it.');
     }
   });
 }
 
-function verifyCode(){
+// function verifyCode(){
+//   $.ajax({
+//     url: '/filter/code',
+//     type: 'post',
+//     data: {input_Code: $('#input-keyck').val(), input: $('#form-burden').serialize()},
+//     dataType: 'json',
+//     success: function(data){
+//       if(!data.result){
+//         console.log('asd');
+//         $('#input-keyck + span').text('Wrong Authenticate Code. We send Code again. Check.');
+//                                 // .fadeIn({duration: 1000, queue: false})
+//                                 // .fadeOut({duration: 2000, queue: false});
+//         verifyEmail();
+//       }else{
+//         moving();
+//       }
+//     }
+//   });
+// }
+
+function moving(code){
+  var data    = $('#form-burden').serializeArray();
+  var object  = {};
+  // 배열 형태로 된 form 데이터를 json 객체 형태로 변환
+  for (var i = 0; i < data.length; i++) {
+      object[data[i].name] = data[i].value;
+  }
   $.ajax({
-    url: '/filter/code',
+    url: '/outside/moving',
     type: 'post',
-    data: {input_Code: $('#input-keyck').val(), input: $('#form-burden').serialize()},
-    dataType: 'json',
-    success: function(data){
-      if(!data.result){
-        console.log('asd');
-        $('#input-keyck + span').text('Wrong Authenticate Code. We send Code again. Check.');
-                                // .fadeIn({duration: 1000, queue: false})
-                                // .fadeOut({duration: 2000, queue: false});
-        verifyEmail();
-      }
-    }
+    data: {user: object, codes: code}
   });
 }

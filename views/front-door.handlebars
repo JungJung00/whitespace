@@ -3,6 +3,17 @@
  .handlebars와 app.js에서 렌더링 할 때 보내는 콘텍스트 객체를 핸들바가 합쳐
  html 파일로 출력한다.
 }}
+<div class="prepost-list-wrapper">
+  <div class="">
+    <a href="#"><span type="button" id="write-post">Write</span></a><br>
+    <ul id="prepost-template-target">
+      <!-- as well as prepost, content -->
+    </ul>
+  </div>
+  <ul id="page" class="page-wrapper">
+    <!-- page -->
+  </ul>
+</div>
 <script type="text/javascript">
 $(document).ready(function(){
   // 일단 첫 페이지 로딩
@@ -21,6 +32,8 @@ $(document).ready(function(){
   });
 
   $('.room-list').click(function(event){
+    var template;
+    var boardVerifyList = $('#prepost-template-target');
     event.preventDefault();
     // 선택한 게시판이 현재 게시판이면 클래스를 조작하지 않는다.
     // TODO 후에 선택된 게시판은 다시 선택할 수 없도록 변경 => href 지우면 되나? css도 좀 바꿔주고
@@ -28,8 +41,7 @@ $(document).ready(function(){
       $('.active-board').removeClass('active-board').addClass('inactive-board');
       $(this).removeClass('inactive-board').addClass('active-board');
     }
-    // 다른 게시판으로 넘어가면 1쪽으로 이동.
-    pagingP($('.active-board').text(), 1);
+    boardVerify($('.active-board').text());
   });
 
   $('#building-room').click(function(event){
@@ -38,14 +50,3 @@ $(document).ready(function(){
   });
 });
 </script>
-<div class="prepost-list-wrapper">
-  <div class="">
-    <a href="#"><span type="button" id="write-post">Write</span></a><br>
-    <ul id="prepost-template-target">
-      <!-- as well as prepost, content -->
-    </ul>
-  </div>
-  <ul id="page" class="page-wrapper">
-    <!-- page -->
-  </ul>
-</div>
