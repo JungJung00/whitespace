@@ -1,6 +1,25 @@
 <div class="board-verify-wrapper">
-  <form class="borad-verify-form" action="/" method="post">
-    <input type="password" name="board-verify-password" placeholder="* * *">
-    <input type="submit" name="board-verify-submitter" value="SUbmit">
+  <form class="board-verify-form" action="/" method="post">
+    <input id="board-input-verify" type="password" name="board-verify-password" placeholder="* * *" class="form-input">
+    <input id="board-verify-submit" type="submit" name="board-verify-submitter" value="SUbmit">
   </form>
 </div>
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('#board-verify-submit').click(function(event){
+      event.preventDefault();
+      $.ajax({
+        url: '/board/verify-check',
+        type: 'post',
+        data: {'input-pass': $('#board-input-verify').val(),'brd-title': $('.active-board').text()},
+        dataType: 'json',
+        success: function(data){
+          if(data.result)
+            pagingP($('.active-board').text(), 1);
+          else
+            alert('Wrong password');
+        }
+      });
+    });
+  });
+</script>
