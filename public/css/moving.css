@@ -13,7 +13,7 @@
   /* to use tooltip*/
   position: relative;
 }
-#pwdck-slider, #keyck-slider{
+#pwdck-slider{
   display: none;
 }
 .tip-text{

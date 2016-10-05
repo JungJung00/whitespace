@@ -32,6 +32,9 @@
 #form-opened{
   border-top: none;
 }
+#form-password{
+  display: none;
+}
 textarea {
   height: 150px;
   padding: 12px 20px;

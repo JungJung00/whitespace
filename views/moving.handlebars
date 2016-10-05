@@ -23,12 +23,6 @@
       <li class="form-moving tip">
         <input type="email" name="email" placeholder="Pollaco@gmail.com" id="input-email" class="form-input"><span class="tip-text"></span>
       </li>
-      <div id="keyck-slider">
-        <label for="keyck">Authenticate Key Check</label>
-        <li class="form-moving tip">
-          <input type="text" name="keyck" placeholder="..." id="input-keyck" class="form-input"><span class="tip-text"></span>
-        </li>
-      </div>
     </ul>
   </form>
   <span><h3>Press <span class="enter">enter</span> to finish moving</h3></span>
@@ -37,10 +31,10 @@
 </div>
 <script type="text/javascript">
 $(document).ready(function(){
-  var check;
+  var checkId, checkPwd, checkPwdck, checkNick, checkEmail;
   $('#input-id').focus();
   $('#input-id').on('textchange', function(){
-    check = idFilter();
+    checkId = idFilter();
   }).on('keydown', function(event){
     switch(event.keyCode){
       case 13:
@@ -49,7 +43,7 @@ $(document).ready(function(){
     }
   });
   $('#input-pwd').on('textchange', function(){
-    check = pwdFilter();
+    checkPwd = pwdFilter();
   }).on('keydown', function(event){
     switch(event.keyCode){
       case 13:
@@ -58,7 +52,7 @@ $(document).ready(function(){
     }
   });
   $('#input-pwdck').on('textchange', function(){
-    check = pwdckFilter();
+    checkPwdck = pwdckFilter();
   }).on('keydown', function(event){
     switch(event.keyCode){
       case 13:
@@ -67,8 +61,7 @@ $(document).ready(function(){
     }
   });
   $('#input-nick').on('textchange', function(){
-    check = nickFilter();
-    console.log(check);
+    checkNick = nickFilter();
   }).on('keydown', function(event){
     switch(event.keyCode){
       case 13:
@@ -77,32 +70,31 @@ $(document).ready(function(){
     }
   });
   $('#input-email').on('textchange', function(){
-    check = emailFilter();
-    console.log(check);
+    checkEmail = emailFilter();
   }).on('keydown', function(event){
     switch(event.keyCode){
       case 13:
-        if(check){verifyEmail();}
+        if(checkId && checkPwd && checkPwdck && checkNick && checkEmail) verifyEmail();
         break;
     }
   });
-  $('#input-keyck').on('textchange', function(){
-    if($('#input-keyck').val().length != 8){
-      $('#input-keyck + span').text('Input Code that 8 long numbers')
-                             .fadeIn({duration: 1000, queue: false});
-    }
-    else{
-      $('#input-keyck + span').text('Accepted').fadeOut({duration: 4000, queue: false});
-      $('#input-keyck').css('border-color', '#19FF5E');
-      $('#input-keyck').on('keydown', function(event){
-        switch(event.keyCode){
-          case 13:
-            verifyCode();
-            break;
-        }
-      })
-    }
-  })
+  // $('#input-keyck').on('textchange', function(){
+  //   if($('#input-keyck').val().length != 8){
+  //     $('#input-keyck + span').text('Input Code that 8 long numbers')
+  //                            .fadeIn({duration: 1000, queue: false});
+  //   }
+  //   else{
+  //     $('#input-keyck + span').text('Accepted').fadeOut({duration: 4000, queue: false});
+  //     $('#input-keyck').css('border-color', '#19FF5E');
+  //     $('#input-keyck').on('keydown', function(event){
+  //       switch(event.keyCode){
+  //         case 13:
+  //           verifyCode();
+  //           break;
+  //       }
+  //     })
+  //   }
+  // });
 });
 </script>
 <script type="text/javascript" src="/js/jquery.splendid.textchange.js"></script>
