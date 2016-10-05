@@ -333,6 +333,24 @@ app.post('/board/verify', function(req, res){
     connection.release();
   });
 });
+app.post('/board/verify-check', function(req, res){
+  pool.getConnection(function(err, connection){
+    if (err) throw err;
+    connection.query('SELECT * FROM board WHERE brd_Title = ?', req.body['brd-title'], function(err, rows){
+      if (err) throw err;
+      hasher({password: req.body['input-pass'], salt: rows[0].brd_Salt}, function(err, pass, salt, hash){
+        if (err) throw err;
+        if(hash == rows[0].brd_Pwd){
+          res.json({result: true});
+        }
+        else {
+          res.json({result: false});
+        }
+      });
+    });
+    connection.release();
+  });
+});
 app.post('/Page', function(req, res){
   // TODO 중복 코드 모듈화 가능한지 생각 : 그냥 통짜로 모듈화 했을 땐 rows 등의 변수를 사용 못함
   // ** 익명함수 function(req, res){...}를 모듈화 하는 방법. -> 모듈 함수에 인자를 req, res로ㅇㅇ
@@ -447,7 +465,7 @@ app.post('/outside/building-room', function(req, res){
           if(!rows[0].mbr_Chance){
             hasher({password: req.body['brd-password']}, function(err, pass, salt, hash){
               if(err) throw err;
-              connection.query('INSERT INTO board VALUES (?, default, ?, ?, default, ?)', [req.body['brd-title'], hash, req.body['brd-opened'], req.user.mbr_Nick], function(err, rows){if (err) throw err;});
+              connection.query('INSERT INTO board VALUES (?, default, ?, ?, ?, default, ?)', [req.body['brd-title'], hash, salt, req.body['brd-opened'], req.user.mbr_Nick], function(err, rows){if (err) throw err;});
             });
             connection.query('INSERT INTO post VALUES (?, default, "Read me", ?, default, ?, default)', [req.body['brd-title'], req.body['brd-explain'], req.user.mbr_Nick], function(err, rows){if (err) throw err;});
             connection.query('UPDATE member SET mbr_Chance = 1 WHERE mbr_Nick = ?', req.user.mbr_Nick, function(err, rows){if (err) throw err;});

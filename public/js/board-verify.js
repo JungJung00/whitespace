@@ -1,4 +1,6 @@
 function boardVerify(title){
+  var template;
+  var boardVerifyList = $('#prepost-template-target');
   $.ajax({
     url: '/board/verify',
     type: 'post',
@@ -9,10 +11,12 @@ function boardVerify(title){
         pagingP(title, 1);
       else{
         $.ajax({
-          url: '/public/js/template/board-verify.handlebars',
+          url: '/js/template/board-verify.handlebars',
           success: function(data){
             template = Handlebars.compile(data);
             boardVerifyList.html(template);
+            $('#page').empty();
+            $('#write-post-wrapper').css('display', 'none');
           }
         });
       }

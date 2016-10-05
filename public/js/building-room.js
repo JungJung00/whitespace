@@ -7,6 +7,7 @@ function buildingRoom(){
       success: function(data){
         template = Handlebars.compile(data);
         prepostList.html(template);
+        $('#write-post-wrapper').css('display', 'none');
         $('#page').empty();
       }
     });
