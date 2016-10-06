@@ -171,6 +171,9 @@ app.get('/outside/moving', function(req, res){
   else
     res.render('moving', {layout: 'none-moving'});
 });
+app.get('/member/customize', function(req, res){
+  res.render('member-customize-template', {mbr_Nick: req.user.mbr_Nick});
+});
 // 입력 데이터 유효성 검사
 app.post('/filter/id', function(req, res){
   pool.getConnection(function(err, connection){

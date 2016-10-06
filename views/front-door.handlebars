@@ -33,7 +33,6 @@ $(document).ready(function(){
 
   $('.room-list').click(function(event){
     event.preventDefault();
-    $('#write-post-wrapper').css('diplay', 'block');
     // 선택한 게시판이 현재 게시판이면 클래스를 조작하지 않는다.
     // TODO 후에 선택된 게시판은 다시 선택할 수 없도록 변경 => href 지우면 되나? css도 좀 바꿔주고
     if(!$(this).hasClass('active-board')){

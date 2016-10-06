@@ -11,7 +11,7 @@ function boardVerify(title){
         pagingP(title, 1);
       else{
         $.ajax({
-          url: '/js/template/board-verify.handlebars',
+          url: '/js/template/board-verify-template.handlebars',
           success: function(data){
             template = Handlebars.compile(data);
             boardVerifyList.html(template);
