@@ -156,7 +156,7 @@ function pwdckFilter(){
 function nickFilter(){
   var check = false;
   // 문자열 바이트 계산
-  // 한글 : 3바이트, 영어-특수문자 : 1바이트
+  // 한글(UTF8) : 3바이트, 영어-특수문자 : 1바이트
   function getByte(s){
     var b, i;
     var c;
@@ -170,10 +170,10 @@ function nickFilter(){
     $('#input-nick').css('border-color', '#FF4040');
     return check;
   }
-  // 4 ~ 30 바이트 외
+  // 6 ~ 30 바이트 외
   // 한글 10자, 영어 30자
-  else if(getByte($('#input-nick').val()) < 4 || getByte($('#input-nick').val()) > 30){
-    $('#input-nick + span').text('Input value between 4 and 30 Bytes long')
+  else if(getByte($('#input-nick').val()) < 6 || getByte($('#input-nick').val()) > 30){
+    $('#input-nick + span').text('Input value between 6 and 30 Bytes long')
                          .fadeIn({duration: 1000, queue: false});
     $('#input-nick').css('border-color', '#FF4040');
     return check;

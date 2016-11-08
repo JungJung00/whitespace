@@ -6,8 +6,11 @@
 <div class="prepost-list-wrapper">
   <div class="">
     <a href="#" id="write-post-wrapper"><span type="button" id="write-post">Write</span></a><br>
+    <ul id="viewpost-template-target">
+
+    </ul>
     <ul id="prepost-template-target">
-      <!-- as well as prepost, content -->
+
     </ul>
   </div>
   <ul id="page" class="page-wrapper">
@@ -46,5 +49,10 @@ $(document).ready(function(){
     event.preventDefault();
     buildingRoom();
   });
+
+  $('#write-post-wrapper').click(function(event){
+    event.preventDefault();
+    postWrite();
+  })
 });
 </script>

@@ -17,6 +17,7 @@ CREATE TABLE member(
 );
 
 CREATE TABLE member_custom(
+  mbr_Id			VARCHAR(20) NOT NULL UNIQUE,
   mbr_Profile_Img_Path		VARCHAR(255) NULL,
   mbr_Profile_Img_Name    VARCHAR(255) NULL
 );

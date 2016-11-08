@@ -1,4 +1,6 @@
 function pagingP(board, _cPage){
+  console.log(board);
+  // $('#prepost-template-target').empty();
   var template;
   var prepostList = $('#prepost-template-target');
   var prepost = '';

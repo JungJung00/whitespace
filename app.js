@@ -67,7 +67,7 @@ app.use(express.static(__dirname + '/public'))
      store: new MySQLStore(dbOption)
    }))
    .use(passport.initialize())
-   .use(passport.session())
+   .use(passport.session());
 
 // 뷰 엔진 핸들바 설정
 app.engine('handlebars', handlebars.engine)
@@ -99,7 +99,7 @@ passport.use(new LocalStrategy(
           // TODO 입력 틀렸을 경우 페이지 만들기
           // 로그인 처리
           connection.query('SELECT CAST(mbr_Id AS CHAR) AS mbr_Id, mbr_Pwd, mbr_Salt, CAST(mbr_Nick AS CHAR) AS mbr_Nick, mbr_Email,'
-                            + 'mbr_Verified + mbr_Chance, mbr_Profile, mbr_Date FROM member WHERE mbr_Id = ?', username, function(err, rows){
+                            + 'mbr_Verified, mbr_Chance, mbr_Date FROM member WHERE mbr_Id = ?', username, function(err, rows){
             if(err){
               console.log('Query Error: ' + err);
               return done(null, false);
@@ -421,22 +421,55 @@ app.post('/Post', function(req, res){
   pool.getConnection(function(err, connection){
     if(err) throw err;
     if(req.body.cBoard == 'front-door'){
-      connection.query('SELECT brd_Title, pst_Date, pst_Id, pst_Title, pst_View, pst_Writer FROM post LIMIT ?, 10', (parseInt(req.body.cPage)-1) * 10, function(err, rows){
+      connection.query('SELECT B.brd_Title, B.pst_Date, B.pst_Id, B.pst_Title, B.pst_View, B.pst_Writer FROM (SELECT pst_Id FROM post ORDER BY pst_Id DESC LIMIT ?, 10) A JOIN post B ON A.pst_Id = B.pst_Id', (parseInt(req.body.cPage)-1) * 10, function(err, rows){
         if(err) throw err;
-
         res.json(rows);
         connection.release();
       });
     }
     else{
-      connection.query('SELECT brd_Title, pst_Date, pst_Id, pst_Title, pst_View, pst_Writer FROM post WHERE brd_Title = ? LIMIT ?, 10', [req.body.cBoard, (parseInt(req.body.cPage)-1) * 10], function(err, rows){
+      console.log('현재 게시판 : ' + req.body.cBoard);
+      console.log('현재 번호 : + ' + parseInt(req.body.cPage));
+      connection.query('SELECT B.brd_Title, B.pst_Date, B.pst_Id, B.pst_Title, B.pst_View, B.pst_Writer FROM (SELECT pst_Id FROM post WHERE brd_Title = ? ORDER BY pst_Id DESC LIMIT ?, 10) A JOIN post B ON A.pst_Id = B.pst_Id', [req.body.cBoard, (parseInt(req.body.cPage)-1) * 10], function(err, rows){
         if(err) throw err;
-
         res.json(rows);
         connection.release();
       });
     }
   });
+});
+app.get('/write-post', function(req, res){
+  res.render('write-post-template');
+});
+app.post('/write-post/boards', function(req, res){
+  pool.getConnection(function(err, connection){
+    if (err) throw err;
+    connection.query('SELECT brd_Title FROM board', function(err, rows){
+      if (err) throw err;
+      if(!rows[0]){
+        res.json({'post-write-boards': 'There are no boards'});
+      }
+      else{
+        _boards = '';
+        for(var i = 0; i < rows.length; i++){
+          _boards += '<option value="' + rows[i].brd_Title + '">' + rows[i].brd_Title + '</option>'
+        }
+        res.json({'post-write-boards':_boards});
+      }
+      connection.release();
+    });
+  })
+});
+app.post('/write-post', function(req, res){
+  console.log(req.body);
+   pool.getConnection(function(err, connection){
+     if (err) throw err;
+     connection.query('INSERT INTO post VALUES (?, default, ?, ?, default, ?, default)', [req.body['post-write-board'], req.body['post-write-title'], req.body['post-write-content'], req.user.mbr_Id], function(err, rows){
+       if (err) throw err;
+     });
+     connection.release();
+     res.redirect('/');
+   });
 });
 app.post('/view-post', function(req, res){
   pool.getConnection(function(err, connection){

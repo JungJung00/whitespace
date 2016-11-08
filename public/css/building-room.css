@@ -35,10 +35,6 @@
 #form-password{
   display: none;
 }
-textarea {
+.building-room-wrapper textarea {
   height: 150px;
-  padding: 12px 20px;
-  background-color: #f8f8f8;
-  font-family: Arial;
-  resize: none;
 }
