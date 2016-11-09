@@ -29,13 +29,13 @@
   width: 75%;
   float: left;
 
-  background-color: rgba(51,0,46,0.1);
+  /*background-color: rgba(51,0,46,0.1);*/
 }
 .prepost-detail{
   width: 25%;
   float: left;
 
-  background-color: rgba(115, 113, 40, 0.1);
+  /*background-color: rgba(115, 113, 40, 0.1);*/
 }
 .prepost span{
   padding-left : 5px;
