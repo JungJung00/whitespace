@@ -1,0 +1,20 @@
+.write-post-wrapper{
+  text-align: center;
+}
+.write-post-wrapper textarea{
+  width: 100%;
+  margin: 0px 10px;
+  border: none;
+  border-bottom: 1px solid rgb(200, 200, 200);
+  outline: none;
+}
+.write-title textarea{
+  font-size: 2.2em;
+  vertical-align:middle;
+}
+.write-content textarea{
+  /* prevent scrollbar flashing */
+  overflow: hidden;
+
+  font-size: 1.1em;
+}

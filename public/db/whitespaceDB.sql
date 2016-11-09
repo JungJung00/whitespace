@@ -12,9 +12,14 @@ CREATE TABLE member(
     mbr_EMail		VARCHAR(100) NOT NULL UNIQUE,
     mbr_Verified	BOOLEAN NOT NULL DEFAULT FALSE,
     mbr_Chance		BOOLEAN NOT NULL DEFAULT FALSE,
-    mbr_Profile		BLOB NULL DEFAULT NULL,
     mbr_Date		DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY(mbr_Id)
+);
+
+CREATE TABLE member_custom(
+  mbr_Id			VARCHAR(20) NOT NULL UNIQUE,
+  mbr_Profile_Img_Path		VARCHAR(255) NULL,
+  mbr_Profile_Img_Name    VARCHAR(255) NULL
 );
 
 CREATE TABLE board(

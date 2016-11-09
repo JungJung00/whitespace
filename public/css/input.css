@@ -20,18 +20,24 @@
   border: 3px solid #FF4040;
 }
 
+textarea {
+  padding: 12px 20px;
+  background-color: #f8f8f8;
+  font-family: Arial;
+  resize: none;
+}
 /****************************************/
 
 /***********placeholder color****************/
 ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
-  color: black;
+  /*color: black;*/
 }
 ::-moz-placeholder { /* Firefox 19+ */
-  color: black;
+  /*color: black;*/
 }
 :-ms-input-placeholder { /* IE 10+ */
-  color: black;
+  /*color: black;*/
 }
 :-moz-placeholder { /* Firefox 18- */
-  color: black;
+  /*color: black;*/
 }

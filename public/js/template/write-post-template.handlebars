@@ -1,0 +1,26 @@
+<div class="write-post-wrapper">
+  <form class="" action="/write-post" method="post">
+    <select id="post-write-boards" name="post-write-board">
+      {{{post-write-boards}}}
+    </select>
+    <div class="write-title">
+      <textarea id="post-write-title" name="post-write-title" placeholder="Title"></textarea>
+    </div>
+    <div class="write-content">
+      <textarea id="post-write-content" name="post-write-content" placeholder="Content"></textarea>
+    </div>
+    <input type="submit" value="Submit">
+  </form>
+</div>
+<script type="text/javascript">
+  $(document).ready(function(){
+    // 스크롤 자동 내리기
+    $('.write-content').on('keyup key', 'textarea', function (){
+      console.log(this.scrollHeight);
+      $(this).css('height', 'auto');
+      $(this).css('height', this.scrollHeight);
+      $(".content-wrapper").scrollTop($(".content-wrapper")[0].scrollHeight);
+    });
+    $('.write-content').find( 'textarea' ).keyup();
+  });
+</script>

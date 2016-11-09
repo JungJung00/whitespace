@@ -1,6 +1,6 @@
 function viewPost(Id){
   var template;
-  var $postList = $('#prepost-template-target');
+  var $postList = $('#viewpost-template-target');
 
   $.ajax({
     url: '/js/template/post-template.handlebars',
@@ -17,6 +17,7 @@ function viewPost(Id){
     success: function(data){
       data.pst_Date = data.pst_Date.replace("T", ' ').replace('.000Z', '')
                                    .replace('-', '.').replace('-', '.');
+      $postList.empty();
       $postList.html(template(data));
     }
   });

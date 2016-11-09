@@ -1,4 +1,6 @@
 function pagingP(board, _cPage){
+  console.log(board);
+  // $('#prepost-template-target').empty();
   var template;
   var prepostList = $('#prepost-template-target');
   var prepost = '';
@@ -31,6 +33,7 @@ function pagingP(board, _cPage){
       if(data.length == 0){
         prepost = template({pst_Id: 0, brd_Title: board, pst_Title: 'There is no post yet! Do share your life', pst_Writer: 'JungJung', pst_Date: '0000-00-00T00:00:00'});
       }
+      $('#write-post-wrapper').css('display', 'block');
       prepostList.html(prepost);
     }
   });
