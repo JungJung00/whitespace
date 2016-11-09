@@ -4,7 +4,7 @@ function viewPost(Id){
   var $postList = $('#viewpost-template-target');  // 템플릿 함수 작업까지 마친 값을 넣을 div
   var cmntList = '';  // comment 값을 임시로 저장할 변수
   // comment 마지막에 추가할 comment 입력 칸
-  var comment = '<form id="comment-form" name="comment-submitter" method="post">\
+  var comment = '<form id="comment-form" name="comment-submitter" action="/write-comment" method="post">\
                 <input type="hidden" name="pst_Id" value="">\
                 <li class="prepost-wrapper">\
                 <div class="prepost prepost-comment-title">\

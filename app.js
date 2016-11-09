@@ -472,7 +472,6 @@ app.post('/write-post', function(req, res){
    });
 });
 app.post('/write-comment', function(req, res){
-  console.log(req.body);
   pool.getConnection(function(err, connection){
     if (err) throw err;
     connection.query('INSERT INTO coment VALUES (?, ?, ?, default)', [req.body.pst_Id ,req.user.mbr_Nick, req.body.cmnt_Content], function(err, rows){
@@ -480,7 +479,7 @@ app.post('/write-comment', function(req, res){
     });
     connection.release();
   });
-  res.end();
+  res.json({status: 'success'});
 });
 app.post('/view-post', function(req, res){
   pool.getConnection(function(err, connection){

@@ -29,8 +29,7 @@
   $(document).ready(function(){
     pagingP($('.active-board').text(), parseInt($('.active-page').text()));
 
-    $('.prepost-comment-detail button').click(function(event){
-      event.preventDefault();
+    $('.prepost-comment-detail button').on('click', function(event){
       console.log("clickckckck");
       var formData='{';
       // form을 serialize()하면 pst_Id=2522&cmnt_Content=와 같이 쿼리 스트링으로 변한다. 이를
@@ -42,10 +41,13 @@
         url: '/write-comment',
         type: 'post',
         data: JSON.parse(formDate),
-        dataType: 'json';
+        dataType: 'json',
+        success: function(data){
+          console.log('plzz');
+          $('.content-wrapper').scrollTop(0)
+          viewPost(parseInt($('#post-id').text().replace('#', '')));
+        }
       });
-      $('.content-wrapper').scrollTop(0)
-      viewPost(parseInt($('#post-id').text().replace('#', '')));
     });
   });
 </script>
