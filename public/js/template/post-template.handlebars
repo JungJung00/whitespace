@@ -2,7 +2,7 @@
     <div id="post-detail" class="">
         <div class="idAndBrd">
           <ul>
-            <li><span class="prepost-small" style="padding-left:1px">#{{this.pst_Id}}</span> <span class="prepost-small" style="padding-right:1px">{{this.brd_Title}}</span></li>
+            <li><span id="post-id" class="prepost-small" style="padding-left:1px">#{{this.pst_Id}}</span> <span class="prepost-small" style="padding-right:1px">{{this.brd_Title}}</span></li>
             <li><span class="prepost-small">{{this.pst_Writer}}</span></li>
           </ul>
         </div>
@@ -19,12 +19,33 @@
     <div id="post-content" class="게시글 내용">
       <span>{{this.pst_Content}}</span>
     </div>
-    <div id="post-comment" class="댓글">
-      댓글 만들어
+    <div class="댓글">
+      <ul id="post-comment">
+
+      </ul>
     </div>
 </div>
 <script type="text/javascript">
   $(document).ready(function(){
     pagingP($('.active-board').text(), parseInt($('.active-page').text()));
+
+    $('.prepost-comment-detail button').click(function(event){
+      event.preventDefault();
+      console.log("clickckckck");
+      var formData='{';
+      // form을 serialize()하면 pst_Id=2522&cmnt_Content=와 같이 쿼리 스트링으로 변한다. 이를
+      // replace와 정규표현식의 g(발생할 모든 패턴에 대한 전역 검색)를 이용해 json 형태로 바꿔준다.
+      formDate += $('#comment-form').serialize().replace(/=/g, ':"')
+                                                .replace(/&/g, '",') + '"}';
+      // comment 전달
+      $.ajax({
+        url: '/write-comment',
+        type: 'post',
+        data: JSON.parse(formDate),
+        dataType: 'json';
+      });
+      $('.content-wrapper').scrollTop(0)
+      viewPost(parseInt($('#post-id').text().replace('#', '')));
+    });
   });
 </script>

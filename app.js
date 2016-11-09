@@ -471,6 +471,17 @@ app.post('/write-post', function(req, res){
      res.redirect('/');
    });
 });
+app.post('/write-comment', function(req, res){
+  console.log(req.body);
+  pool.getConnection(function(err, connection){
+    if (err) throw err;
+    connection.query('INSERT INTO coment VALUES (?, ?, ?, default)', [req.body.pst_Id ,req.user.mbr_Nick, req.body.cmnt_Content], function(err, rows){
+      if (err) throw err;
+    });
+    connection.release();
+  });
+  res.end();
+});
 app.post('/view-post', function(req, res){
   pool.getConnection(function(err, connection){
     if (err) throw err;
@@ -486,6 +497,16 @@ app.post('/view-post', function(req, res){
         connection.release();
       });
     }
+  });
+});
+app.post('/view-post-comment', function(req, res){
+  pool.getConnection(function(err, connection){
+    if (err) throw err;
+    connection.query('SELECT B.* FROM (SELECT pst_Id, cmnt_Date FROM coment WHERE pst_Id = ? ORDER BY cmnt_Date DESC) A JOIN coment B ON A.pst_Id = B.pst_Id AND A.cmnt_Date = B.cmnt_Date', [req.body.postId], function(err, rows){
+      if (err) throw err;
+      res.json(rows);
+    });
+    connection.release();
   });
 });
 

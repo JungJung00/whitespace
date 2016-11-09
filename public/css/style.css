@@ -27,7 +27,7 @@ a{
   max-width: 100%;
 }
 #board{
-  margin-top: 0px;
+  margin : 0px;
   padding-left: 0px;
 }
 #board a{
