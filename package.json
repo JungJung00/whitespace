@@ -2,7 +2,10 @@
   "name": "whitespace",
   "version": "1.0.0",
   "description": "community site",
-  "main": "index.js",
+  "main": "app.js",
+  "engines": {
+    "node": "4.1.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
