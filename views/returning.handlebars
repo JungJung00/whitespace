@@ -18,12 +18,12 @@
     $('#login-id').focus();
     $('#login-id').on('textchange', function(){
       if($('#login-id').val().length < 6 || $('#login-id').val().length > 20){
-        $('#warning h1').text('Input 6 ~ 20').fadeIn({duration:1000, queue: false});
+        $('#warning h1').text('Input 6 ~ 20').fadeIn({duration:0, queue: false}).css('color', '#FF4040');
         $('#login-id').css('border-color', '#FF4040');
         checkId = false;
       }
       else{
-        $('#warning h1').text('Accepted').fadeIn({duration:1000, queue: false}).fadeOut({duration:1000, queue: false});
+        $('#warning h1').text('Accepted').fadeIn({duration:0, queue: false}).css('color', '#19FF5E').fadeOut({duration:2000, queue: false});
         $('#login-id').css('border-color', '#19FF5E');
         checkId = true;
       }
@@ -36,12 +36,12 @@
 
     $('#login-pwd').on('textchange', function(){
       if($('#login-pwd').val().length < 6 || $('#login-pwd').val().length > 40){
-        $('#warning h1').text('Input 6 ~ 20').fadeIn({duration:1000, queue: false});
+        $('#warning h1').text('Input 6 ~ 20').fadeIn({duration:0, queue: false}).css('color', '#FF4040');
         $('#login-pwd').css('border-color', '#FF4040');
         checkPwd = false;
       }
       else{
-        $('#warning h1').text('Accepted').fadeIn({duration:1000, queue: false}).fadeOut({duration:1000, queue: false});
+        $('#warning h1').text('Accepted').fadeIn({duration:0, queue: false}).css('color', '#19FF5E').fadeOut({duration:2000, queue: false});
         $('#login-pwd').css('border-color', '#19FF5E');
         checkPwd = true;
       }
