@@ -4,7 +4,7 @@ module.exports = function(app, pool){
     var _boards = '';
 
     if(!req.user){
-        res.redirect('/returning');
+        res.redirect('/outside/returning');
     }
     else{
       // emailService.sendKey('cyzhtkxkd50@naver.com', )
