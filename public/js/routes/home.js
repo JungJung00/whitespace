@@ -1,10 +1,10 @@
 module.exports = function(app, pool){
-  app.get('/', function(req, res){
+  app.get('whtspc.herokuapp.com/', function(req, res){
     // 게시판 목록 저장
     var _boards = '';
 
     if(!req.user){
-        res.redirect('/outside/returning');
+        res.redirect('whtspc.herokuapp.com/outside/returning');
     }
     else{
       // emailService.sendKey('cyzhtkxkd50@naver.com', )
