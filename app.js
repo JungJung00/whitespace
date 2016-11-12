@@ -29,7 +29,6 @@ var dbOption = {
   database: 'heroku_a9f1b70cbd1f5d3',
   connectionLimit: 10
 }
-mysql url://b039430e5252e3:65bbc547@us-cdbr-iron-east-04.cleardb.net/heroku_a9f1b70cbd1f5d3?reconnect=true
 
 var pool = mysql.createPool(dbOption);
 // 로그인 인증 관련
@@ -96,5 +95,5 @@ app.use(function(err, req, res, next){
 /******************************************/
 
 app.listen(app.get ('port'), function(){
- console.log('Server is running 3001 port');
+ console.log('Server is running' + app.get('port') + ' port');
 });
