@@ -13,14 +13,24 @@ var session = require('express-session');
 // DB 관련
 var MySQLStore = require('express-mysql-session')(session);
 var mysql = require('mysql');
+// var dbOption = {
+//   host: 'localhost',
+//   user: 'root',
+//   port: 3306,
+//   password: 'ehehgks!!123',
+//   database: 'whitespace',
+//   connectionLimit: 10
+// }
 var dbOption = {
-  host: 'localhost',
-  user: 'root',
-  port: 3306,
-  password: 'ehehgks!!123',
-  database: 'whitespace',
+  host: 'us-cdbr-iron-east-04.cleardb.net',
+  user: 'b039430e5252e3',
+  // port: 3306,
+  password: '65bbc547',
+  database: 'heroku_a9f1b70cbd1f5d3',
   connectionLimit: 10
 }
+mysql url://b039430e5252e3:65bbc547@us-cdbr-iron-east-04.cleardb.net/heroku_a9f1b70cbd1f5d3?reconnect=true
+
 var pool = mysql.createPool(dbOption);
 // 로그인 인증 관련
 var passport = require('passport');
@@ -51,7 +61,9 @@ app.engine('handlebars', handlebars.engine)
 
 // 애플리케이션 포트 지정
 // res.writeHead 대용
-app.set('port', process.env.PORT || 3001);
+// app.set('port', process.env.PORT || 3001);
+app.set('port', process.env.PORT || 5000);
+
 
 /****************************************/
 
