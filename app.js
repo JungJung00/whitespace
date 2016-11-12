@@ -13,22 +13,24 @@ var session = require('express-session');
 // DB 관련
 var MySQLStore = require('express-mysql-session')(session);
 var mysql = require('mysql');
-// var dbOption = {
-//   host: 'localhost',
-//   user: 'root',
-//   port: 3306,
-//   password: 'ehehgks!!123',
-//   database: 'whitespace',
-//   connectionLimit: 10
-// }
+// for local
 var dbOption = {
-  host: 'us-cdbr-iron-east-04.cleardb.net',
-  user: 'b039430e5252e3',
-  // port: 3306,
-  password: '65bbc547',
-  database: 'heroku_a9f1b70cbd1f5d3',
+  host: 'localhost',
+  user: 'root',
+  port: 3306,
+  password: 'ehehgks!!123',
+  database: 'whitespace',
   connectionLimit: 10
 }
+
+// for heroku
+// var dbOption = {
+//   host: 'us-cdbr-iron-east-04.cleardb.net',
+//   user: 'b039430e5252e3',
+//   password: '65bbc547',
+//   database: 'heroku_a9f1b70cbd1f5d3',
+//   connectionLimit: 10
+// }
 
 var pool = mysql.createPool(dbOption);
 // 로그인 인증 관련
